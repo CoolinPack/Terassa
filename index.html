@@ -181,10 +181,10 @@
 
         .phone-request {
             text-align: center;
-            padding: 20px 0;
+            padding: 10px 0;
         }
         .phone-request .icon { font-size: 56px; display: block; margin-bottom: 12px; }
-        .phone-request p { color: #666; margin-bottom: 16px; font-size: 14px; }
+        .phone-request p { color: #666; margin-bottom: 16px; font-size: 14px; line-height: 1.6; }
 
         .phone-btn {
             background: var(--primary);
@@ -200,6 +200,7 @@
             font-family: 'Inter', sans-serif;
         }
         .phone-btn:active { transform: scale(0.97); }
+        .phone-btn .sub { font-weight: 400; font-size: 13px; opacity: 0.8; display: block; margin-top: 4px; }
 
         /* ПОИСК */
         .search-box {
@@ -531,14 +532,23 @@
             <div class="phone-request">
                 <span class="icon">📱</span>
                 <p>Для входа в приложение необходимо поделиться номером телефона</p>
-                <button class="phone-btn" onclick="requestPhone()">
+
+                <!-- Кнопка для Telegram -->
+                <button class="phone-btn" id="telegramPhoneBtn" onclick="requestPhone()">
                     📱 Поделиться номером
+                    <span class="sub">Telegram отправит ваш номер</span>
                 </button>
+
+                <!-- Кнопка для браузера (только для тестов) -->
+                <button class="phone-btn" id="browserPhoneBtn" style="display:none;background:#6c757d;margin-top:8px;" onclick="manualPhone()">
+                    ✏️ Ввести номер вручную (тест)
+                </button>
+
                 <p style="font-size:12px;color:#aaa;margin-top:12px;">Ваш номер будет использован только для связи с рестораном</p>
             </div>
         </div>
 
-        <!-- ШАГ 2: РЕГИСТРАЦИЯ (появляется после получения номера) -->
+        <!-- ШАГ 2: РЕГИСТРАЦИЯ -->
         <div id="registrationStep" style="display:none;">
             <p style="text-align:center;color:var(--success);font-weight:600;margin-bottom:16px;">✅ Номер получен!</p>
             <p style="text-align:center;color:#888;font-size:14px;margin-bottom:16px;">Заполните данные для регистрации</p>
@@ -776,7 +786,8 @@
     // 2. СОСТОЯНИЕ
     // ============================================================
 
-    const ADMIN_ID = 8166237921; // ТВОЙ TELEGRAM ID
+    // ЗДЕСЬ ВСТАВЬ СВОЙ ID
+    const ADMIN_ID = 8166237921;
 
     let cart = [];
     let user = null;
@@ -790,24 +801,60 @@
     const CATEGORIES = ['Все', ...new Set(MENU.map(d => d.category))];
 
     // ============================================================
-    // 3. АВТОРИЗАЦИЯ
+    // 3. АВТОРИЗАЦИЯ (РАБОТАЕТ ВЕЗДЕ)
     // ============================================================
 
+    // Проверяем, открыто ли приложение в Telegram
+    function isTelegramWebApp() {
+        return window.Telegram?.WebApp !== undefined;
+    }
+
+    // Инициализация кнопок
+    function initAuthButtons() {
+        const isTelegram = isTelegramWebApp();
+        
+        // В Telegram показываем кнопку "Поделиться номером"
+        // В браузере показываем "Ввести вручную"
+        document.getElementById('telegramPhoneBtn').style.display = isTelegram ? 'block' : 'none';
+        document.getElementById('browserPhoneBtn').style.display = isTelegram ? 'none' : 'block';
+        
+        // Если открыто в Telegram, но API не готов — пробуем инициализировать
+        if (isTelegram) {
+            try {
+                window.Telegram.WebApp.expand();
+            } catch(e) {}
+        }
+    }
+
     function requestPhone() {
-        if (window.Telegram?.WebApp) {
+        if (!isTelegramWebApp()) {
+            alert('❌ Эта функция доступна только в Telegram.\n\nИспользуйте кнопку "Ввести номер вручную" для теста.');
+            return;
+        }
+
+        try {
             window.Telegram.WebApp.requestContact((contact) => {
                 if (contact?.phone_number) {
                     userPhone = contact.phone_number;
                     document.getElementById('phoneRequestStep').style.display = 'none';
                     document.getElementById('registrationStep').style.display = 'block';
                     
-                    // Получаем username
                     const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
                     userUsername = tgUser?.username || null;
                 }
             });
-        } else {
-            alert('Откройте приложение через Telegram, чтобы поделиться номером');
+        } catch(e) {
+            alert('❌ Ошибка запроса номера.\nПопробуйте обновить страницу.');
+            console.error(e);
+        }
+    }
+
+    function manualPhone() {
+        const phone = prompt('Введите номер телефона для теста:', '+7');
+        if (phone && phone.trim()) {
+            userPhone = phone.trim();
+            document.getElementById('phoneRequestStep').style.display = 'none';
+            document.getElementById('registrationStep').style.display = 'block';
         }
     }
 
@@ -825,6 +872,14 @@
         if (!userPhone) {
             alert('Сначала поделитесь номером телефона');
             return;
+        }
+
+        // Получаем username если есть
+        if (!userUsername && isTelegramWebApp()) {
+            try {
+                const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+                userUsername = tgUser?.username || null;
+            } catch(e) {}
         }
 
         user = {
@@ -865,7 +920,7 @@
     }
 
     // ============================================================
-    // 5. МЕНЮ (с категориями, поиском и стоп-листом)
+    // 5. МЕНЮ
     // ============================================================
 
     function renderCategoryTabs() {
@@ -1157,7 +1212,6 @@
                 orderHistory.unshift(order);
                 saveOrdersToStorage();
 
-                // Предупреждение если нет username
                 if (!user.username) {
                     alert(
                         '✅ Заказ отправлен!\n\n' +
@@ -1186,7 +1240,7 @@
     }
 
     // ============================================================
-    // 8. ПРОФИЛЬ + ИСТОРИЯ ЗАКАЗОВ
+    // 8. ПРОФИЛЬ + ИСТОРИЯ
     // ============================================================
 
     function renderProfile() {
@@ -1346,17 +1400,23 @@
 
     // Telegram WebApp
     if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.expand();
-        const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-        if (tgUser) {
-            document.getElementById('authName').value = tgUser.first_name || '';
-            document.getElementById('authSurname').value = tgUser.last_name || '';
-            userUsername = tgUser.username || null;
-        }
+        try {
+            window.Telegram.WebApp.expand();
+            const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+            if (tgUser) {
+                document.getElementById('authName').value = tgUser.first_name || '';
+                document.getElementById('authSurname').value = tgUser.last_name || '';
+                userUsername = tgUser.username || null;
+            }
+        } catch(e) {}
     }
+
+    // Инициализация кнопок авторизации
+    initAuthButtons();
 
     console.log('🍷 Terassa Restaurant Mini App загружен!');
     console.log('👑 Админ ID:', ADMIN_ID);
+    console.log('📱 Режим:', isTelegramWebApp() ? 'Telegram WebApp' : 'Браузер (тест)');
 </script>
 
 </body>
