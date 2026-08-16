@@ -1,10 +1,835 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Terassa Restaurant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f9f4ed;
+            color: #2d2a24;
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        /* Цвета */
+        :root {
+            --primary: #8b3a2b;
+            --primary-dark: #6f2d20;
+            --secondary: #d4a373;
+            --cream: #f9f4ed;
+            --gold: #c9a96e;
+            --text: #2d2a24;
+        }
+
+        /* Шрифты */
+        .font-serif { font-family: 'Playfair Display', serif; }
+
+        /* Кнопки */
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .btn-primary:active { transform: scale(0.97); }
+
+        /* Карточки */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 12px;
+        }
+
+        /* Навигация */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 430px;
+            width: 100%;
+            background: #fff;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 12px;
+            z-index: 100;
+        }
+        .bottom-nav button {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
+            cursor: pointer;
+            padding: 4px 16px;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .bottom-nav button.active { color: var(--primary); font-weight: 600; }
+        .bottom-nav button .icon { font-size: 24px; margin-bottom: 2px; }
+
+        /* Страницы */
+        .page {
+            display: none;
+            padding: 20px 16px;
+            animation: fade 0.25s ease;
+        }
+        .page.active { display: block; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Авторизация */
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: var(--cream);
+        }
+        .auth-box {
+            background: #fff;
+            border-radius: 28px;
+            padding: 36px 28px;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+        }
+        .auth-box h1 {
+            font-size: 36px;
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        .auth-box p.sub {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .auth-box input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #e0d6cc;
+            padding: 12px 0 8px;
+            font-size: 16px;
+            outline: none;
+            background: transparent;
+            transition: 0.2s;
+            margin-bottom: 16px;
+            font-family: 'Inter', sans-serif;
+        }
+        .auth-box input:focus { border-color: var(--primary); }
+
+        /* Блюда в меню */
+        .dish-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0ebe4;
+        }
+        .dish-item:last-child { border-bottom: none; }
+        .dish-info h4 { font-size: 16px; font-weight: 600; }
+        .dish-info p { font-size: 14px; color: #666; }
+        .dish-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dish-actions .qty {
+            font-weight: 600;
+            min-width: 24px;
+            text-align: center;
+        }
+        .dish-actions button {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dish-actions button:active { transform: scale(0.92); }
+        .dish-actions button.outline {
+            background: #f0ebe4;
+            color: var(--text);
+        }
+
+        /* Категории */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 8px 0 16px;
+            scrollbar-width: none;
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        .category-tabs button {
+            background: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .category-tabs button.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* Корзина */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0ebe4;
+        }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item .name { font-weight: 500; }
+        .cart-item .price { color: #666; font-size: 14px; }
+        .cart-item .controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .cart-item .controls button {
+            background: #f0ebe4;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .cart-item .controls button:active { transform: scale(0.92); }
+        .cart-item .controls .qty { font-weight: 600; min-width: 20px; text-align: center; }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 16px 0 8px;
+            border-top: 2px solid var(--secondary);
+            margin-top: 4px;
+        }
+
+        .delivery-options {
+            display: flex;
+            gap: 12px;
+            margin: 12px 0 16px;
+        }
+        .delivery-options button {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0d6cc;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .delivery-options button.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .badge {
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            border-radius: 50%;
+            padding: 2px 7px;
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            font-weight: 700;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0ebe4;
+        }
+        .profile-row:last-child { border-bottom: none; }
+        .profile-row .label { color: #888; }
+        .profile-row .value { font-weight: 500; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty-state .icon { font-size: 56px; margin-bottom: 12px; }
+
+        /* Баннер скидок */
+        .discount-banner {
+            background: linear-gradient(135deg, var(--secondary), var(--gold));
+            border-radius: 16px;
+            padding: 20px;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .discount-banner h3 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+
+        /* Ингредиенты модалка */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 28px 24px;
+            max-width: 360px;
+            width: 100%;
+            animation: fade 0.2s ease;
+        }
+        .modal-box h3 { font-size: 20px; margin-bottom: 8px; }
+        .modal-box ul { padding-left: 20px; margin: 12px 0 16px; }
+        .modal-box ul li { padding: 4px 0; color: #555; }
+        .modal-box .close-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hidden { display: none !important; }
+        .mt-8 { margin-top: 8px; }
+        .mt-16 { margin-top: 16px; }
+        .text-center { text-align: center; }
+        .text-muted { color: #888; font-size: 14px; }
+
+        /* Адаптив */
+        @media (max-width: 430px) {
+            body { max-width: 100%; }
+            .bottom-nav { max-width: 100%; }
+        }
+    </style>
 </head>
 <body>
-    <h1>🍷 Terassa Restaurant</h1>
-    <p>Mini App загружается...</p>
+
+<!-- ===== АВТОРИЗАЦИЯ ===== -->
+<div id="authScreen" class="auth-screen">
+    <div class="auth-box">
+        <div style="text-align:center;font-size:48px;margin-bottom:4px;">🍷</div>
+        <h1>Terassa</h1>
+        <p class="sub">Ресторан итальянской кухни</p>
+
+        <input type="tel" id="authPhone" placeholder="Телефон" />
+        <input type="text" id="authName" placeholder="Имя" />
+        <input type="text" id="authSurname" placeholder="Фамилия" />
+        <input type="text" id="authBirth" placeholder="Год рождения (опционально)" />
+
+        <button class="btn-primary" onclick="authUser()">Войти</button>
+        <p style="text-align:center;font-size:12px;color:#aaa;margin-top:16px;">Нажимая кнопку, вы соглашаетесь с условиями</p>
+    </div>
+</div>
+
+<!-- ===== ОСНОВНОЕ ПРИЛОЖЕНИЕ ===== -->
+<div id="app" style="display:none;">
+
+    <!-- СТРАНИЦА: ГЛАВНАЯ -->
+    <div id="pageHome" class="page active">
+        <div style="margin-bottom:20px;">
+            <span class="font-serif" style="font-size:28px;color:var(--primary);font-weight:700;">Terassa</span>
+            <p style="color:#888;">Добро пожаловать! 👋</p>
+        </div>
+
+        <!-- Баннер скидок -->
+        <div class="discount-banner">
+            <h3>🎉 Скидки</h3>
+            <p style="opacity:0.9;">Скоро здесь будут акции и персональные предложения</p>
+        </div>
+
+        <!-- Популярное -->
+        <h3 style="margin-bottom:12px;font-size:18px;">🔥 Популярное</h3>
+        <div id="popularList"></div>
+
+        <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="card" style="text-align:center;cursor:pointer;" onclick="navigateTo('pageMenu')">
+                <div style="font-size:32px;">🍽️</div>
+                <div style="font-weight:600;">Меню</div>
+            </div>
+            <div class="card" style="text-align:center;cursor:pointer;" onclick="navigateTo('pageCart')">
+                <div style="font-size:32px;">🛒</div>
+                <div style="font-weight:600;">Корзина</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СТРАНИЦА: МЕНЮ -->
+    <div id="pageMenu" class="page">
+        <h2 class="font-serif" style="color:var(--primary);margin-bottom:12px;">🍽️ Меню</h2>
+
+        <div class="category-tabs" id="categoryTabs"></div>
+
+        <div id="menuList"></div>
+    </div>
+
+    <!-- СТРАНИЦА: КОРЗИНА -->
+    <div id="pageCart" class="page">
+        <h2 class="font-serif" style="color:var(--primary);margin-bottom:12px;">🛒 Корзина</h2>
+        <div id="cartList"></div>
+    </div>
+
+    <!-- СТРАНИЦА: ПРОФИЛЬ -->
+    <div id="pageProfile" class="page">
+        <h2 class="font-serif" style="color:var(--primary);margin-bottom:12px;">👤 Профиль</h2>
+        <div class="card" id="profileInfo"></div>
+    </div>
+
+    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+    <div class="bottom-nav">
+        <button class="active" data-page="pageHome" onclick="navigateTo('pageHome')">
+            <span class="icon">🏠</span> Главная
+        </button>
+        <button data-page="pageMenu" onclick="navigateTo('pageMenu')">
+            <span class="icon">🍽️</span> Меню
+        </button>
+        <button data-page="pageCart" onclick="navigateTo('pageCart')" style="position:relative;">
+            <span class="icon">🛒</span> Корзина
+            <span class="badge" id="cartBadge" style="display:none;">0</span>
+        </button>
+        <button data-page="pageProfile" onclick="navigateTo('pageProfile')">
+            <span class="icon">👤</span> Профиль
+        </button>
+    </div>
+
+</div>
+
+<!-- ===== МОДАЛКА ИНГРЕДИЕНТОВ ===== -->
+<div class="modal-overlay" id="ingredientModal">
+    <div class="modal-box">
+        <h3 id="modalDishName">Название</h3>
+        <p style="color:#888;font-size:14px;">Состав:</p>
+        <ul id="modalIngredientsList"></ul>
+        <button class="close-btn" onclick="closeModal()">Закрыть</button>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // 1. ДАННЫЕ
+    // ============================================================
+
+    const MENU = [
+        { id: 1, name: 'Цезарь с креветками', price: 890, category: 'Салаты', ingredients: ['креветки', 'салат айсберг', 'пармезан', 'соус цезарь'], popular: true },
+        { id: 2, name: 'Стейк рибай', price: 2150, category: 'Горячее', ingredients: ['говядина', 'соль', 'перец', 'розмарин'], popular: true },
+        { id: 3, name: 'Паста карбонара', price: 750, category: 'Горячее', ingredients: ['спагетти', 'бекон', 'яйцо', 'пармезан'], popular: false },
+        { id: 4, name: 'Греческий салат', price: 590, category: 'Салаты', ingredients: ['помидоры', 'огурцы', 'фета', 'оливки'], popular: false },
+        { id: 5, name: 'Тирамису', price: 450, category: 'Десерты', ingredients: ['савоярди', 'маскарпоне', 'кофе', 'какао'], popular: true },
+        { id: 6, name: 'Лимонный тарт', price: 420, category: 'Десерты', ingredients: ['песочное тесто', 'лимонный курд', 'меренга'], popular: false },
+        { id: 7, name: 'Лосось на гриле', price: 1250, category: 'Горячее', ingredients: ['лосось', 'лимон', 'укроп', 'оливковое масло'], popular: false },
+        { id: 8, name: 'Ризотто с грибами', price: 680, category: 'Горячее', ingredients: ['рис арборио', 'белые грибы', 'пармезан'], popular: false },
+        { id: 9, name: 'Капучино', price: 220, category: 'Напитки', ingredients: ['эспрессо', 'молоко', 'пена'], popular: false },
+        { id: 10, name: 'Лимонад', price: 250, category: 'Напитки', ingredients: ['лимон', 'лайм', 'мята', 'сахарный сироп'], popular: false },
+    ];
+
+    const CATEGORIES = ['Все', ...new Set(MENU.map(d => d.category))];
+
+    // ============================================================
+    // 2. СОСТОЯНИЕ
+    // ============================================================
+
+    let cart = [];
+    let user = null;
+    let currentCategory = 'Все';
+    let selectedDish = null;
+
+    // ============================================================
+    // 3. АВТОРИЗАЦИЯ
+    // ============================================================
+
+    function authUser() {
+        const phone = document.getElementById('authPhone').value.trim();
+        const name = document.getElementById('authName').value.trim();
+        const surname = document.getElementById('authSurname').value.trim();
+        const birth = document.getElementById('authBirth').value.trim();
+
+        if (!phone || !name || !surname) {
+            alert('Заполните все обязательные поля');
+            return;
+        }
+
+        user = { phone, name, surname, birthYear: birth };
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        renderAll();
+    }
+
+    // ============================================================
+    // 4. НАВИГАЦИЯ
+    // ============================================================
+
+    function navigateTo(pageId) {
+        // Скрыть все страницы
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+
+        // Обновить кнопки навигации
+        document.querySelectorAll('.bottom-nav button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.page === pageId);
+        });
+
+        // Рендерим контент
+        if (pageId === 'pageMenu') renderMenu();
+        if (pageId === 'pageCart') renderCart();
+        if (pageId === 'pageProfile') renderProfile();
+    }
+
+    // ============================================================
+    // 5. МЕНЮ
+    // ============================================================
+
+    function renderCategoryTabs() {
+        const container = document.getElementById('categoryTabs');
+        container.innerHTML = CATEGORIES.map(cat =>
+            `<button class="${cat === currentCategory ? 'active' : ''}" onclick="setCategory('${cat}')">${cat}</button>`
+        ).join('');
+    }
+
+    function setCategory(cat) {
+        currentCategory = cat;
+        renderCategoryTabs();
+        renderMenu();
+    }
+
+    function renderMenu() {
+        const container = document.getElementById('menuList');
+        const filtered = currentCategory === 'Все'
+            ? MENU
+            : MENU.filter(d => d.category === currentCategory);
+
+        if (!filtered.length) {
+            container.innerHTML = '<div class="empty-state"><p>Нет блюд в этой категории</p></div>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(dish => {
+            const inCart = cart.find(c => c.id === dish.id);
+            const qty = inCart ? inCart.quantity : 0;
+
+            return `
+                <div class="dish-item">
+                    <div class="dish-info">
+                        <h4>${dish.name} ${dish.popular ? '🔥' : ''}</h4>
+                        <p>${dish.price} ₽</p>
+                        ${dish.ingredients ? `<span style="font-size:12px;color:var(--secondary);cursor:pointer;" onclick="showIngredients(${dish.id})">Состав →</span>` : ''}
+                    </div>
+                    <div class="dish-actions">
+                        ${qty > 0 ? `<span class="qty">${qty}</span>` : ''}
+                        <button onclick="addToCart(${dish.id})">+</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ============================================================
+    // 6. КОРЗИНА
+    // ============================================================
+
+    function addToCart(id) {
+        const dish = MENU.find(d => d.id === id);
+        if (!dish) return;
+
+        const existing = cart.find(c => c.id === id);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            cart.push({ ...dish, quantity: 1 });
+        }
+        updateBadge();
+        renderMenu();
+    }
+
+    function removeFromCart(id) {
+        const existing = cart.find(c => c.id === id);
+        if (!existing) return;
+        if (existing.quantity > 1) {
+            existing.quantity -= 1;
+        } else {
+            cart = cart.filter(c => c.id !== id);
+        }
+        updateBadge();
+        renderCart();
+        renderMenu();
+    }
+
+    function clearCart() {
+        if (cart.length === 0) return;
+        if (confirm('Очистить корзину?')) {
+            cart = [];
+            updateBadge();
+            renderCart();
+            renderMenu();
+        }
+    }
+
+    function getTotal() {
+        return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    }
+
+    function updateBadge() {
+        const badge = document.getElementById('cartBadge');
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        if (total > 0) {
+            badge.style.display = 'inline';
+            badge.textContent = total;
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    function renderCart() {
+        const container = document.getElementById('cartList');
+
+        if (cart.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="icon">🛒</div><p>Корзина пуста</p></div>';
+            return;
+        }
+
+        let html = '';
+        cart.forEach(item => {
+            html += `
+                <div class="cart-item">
+                    <div>
+                        <div class="name">${item.name}</div>
+                        <div class="price">${item.price} ₽ × ${item.quantity}</div>
+                    </div>
+                    <div class="controls">
+                        <button onclick="removeFromCart(${item.id})">−</button>
+                        <span class="qty">${item.quantity}</span>
+                        <button onclick="addToCart(${item.id})">+</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        const total = getTotal();
+
+        html += `
+            <div class="total-row">
+                <span>Итого</span>
+                <span>${total} ₽</span>
+            </div>
+
+            <div class="delivery-options">
+                <button id="deliveryPickup" class="active" onclick="setDelivery('pickup')">🏠 Заберу с собой</button>
+                <button id="deliveryDelivery" onclick="setDelivery('delivery')">🚀 Доставка</button>
+            </div>
+
+            <button class="btn-primary" onclick="placeOrder()">Оформить заказ</button>
+            <button class="btn-primary" style="background:#ccc;color:#555;margin-top:8px;" onclick="clearCart()">Очистить</button>
+        `;
+
+        container.innerHTML = html;
+    }
+
+    let deliveryType = 'pickup';
+
+    function setDelivery(type) {
+        deliveryType = type;
+        document.getElementById('deliveryPickup').classList.toggle('active', type === 'pickup');
+        document.getElementById('deliveryDelivery').classList.toggle('active', type === 'delivery');
+    }
+
+    // ============================================================
+    // 7. ОФОРМЛЕНИЕ ЗАКАЗА
+    // ============================================================
+
+    async function placeOrder() {
+        if (cart.length === 0) {
+            alert('Корзина пуста');
+            return;
+        }
+
+        if (!user) {
+            alert('Пожалуйста, войдите в систему');
+            return;
+        }
+
+        const orderData = {
+            user_name: user.name,
+            user_surname: user.surname,
+            user_phone: user.phone,
+            user_birth_year: user.birthYear || '',
+            items: cart.map(item => ({
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+            })),
+            total: getTotal(),
+            delivery_type: deliveryType,
+        };
+
+        try {
+            const response = await fetch('https://terassa.onrender.com/webhook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData),
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                alert('✅ Заказ успешно отправлен! Спасибо!');
+                cart = [];
+                updateBadge();
+                renderCart();
+                renderMenu();
+                if (window.Telegram?.WebApp) window.Telegram.WebApp.close();
+            } else {
+                alert('❌ Ошибка при отправке заказа: ' + (result.error || 'Неизвестная ошибка'));
+            }
+        } catch (err) {
+            alert('❌ Ошибка соединения с сервером. Попробуйте позже.');
+            console.error(err);
+        }
+    }
+
+    // ============================================================
+    // 8. ПРОФИЛЬ
+    // ============================================================
+
+    function renderProfile() {
+        if (!user) return;
+        const container = document.getElementById('profileInfo');
+        container.innerHTML = `
+            <div style="text-align:center;padding:12px 0 16px;">
+                <div style="font-size:48px;">👨‍🍳</div>
+                <h3 style="font-size:20px;">${user.name} ${user.surname}</h3>
+                <p style="color:#888;">${user.phone}</p>
+            </div>
+            <div class="profile-row"><span class="label">Имя</span><span class="value">${user.name}</span></div>
+            <div class="profile-row"><span class="label">Фамилия</span><span class="value">${user.surname}</span></div>
+            <div class="profile-row"><span class="label">Телефон</span><span class="value">${user.phone}</span></div>
+            <div class="profile-row"><span class="label">Год рождения</span><span class="value">${user.birthYear || 'не указан'}</span></div>
+            ${user.birthYear ? `<div style="margin-top:16px;padding:12px;background:#fef9e7;border-radius:12px;text-align:center;color:#b7950b;">🎂 Скидка на день рождения (активируется в ваш день)</div>` : ''}
+            <div style="margin-top:16px;padding:12px;background:#f0ebe4;border-radius:12px;text-align:center;color:#666;">
+                <div style="font-size:14px;">Статистика</div>
+                <div style="font-size:18px;font-weight:700;">0 заказов</div>
+            </div>
+        `;
+    }
+
+    // ============================================================
+    // 9. ИНГРЕДИЕНТЫ (МОДАЛКА)
+    // ============================================================
+
+    function showIngredients(id) {
+        const dish = MENU.find(d => d.id === id);
+        if (!dish || !dish.ingredients) return;
+        selectedDish = dish;
+        document.getElementById('modalDishName').textContent = dish.name;
+        document.getElementById('modalIngredientsList').innerHTML = dish.ingredients.map(i => `<li>${i}</li>`).join('');
+        document.getElementById('ingredientModal').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('ingredientModal').classList.remove('open');
+    }
+
+    // Закрытие по клику вне модалки
+    document.getElementById('ingredientModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // ============================================================
+    // 10. ПОПУЛЯРНОЕ НА ГЛАВНОЙ
+    // ============================================================
+
+    function renderPopular() {
+        const container = document.getElementById('popularList');
+        const popular = MENU.filter(d => d.popular).slice(0, 3);
+        container.innerHTML = popular.map(d => `
+            <div class="card" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="navigateTo('pageMenu')">
+                <div>
+                    <div style="font-weight:600;">${d.name}</div>
+                    <div style="color:#888;font-size:14px;">${d.price} ₽</div>
+                </div>
+                <div style="color:var(--primary);font-size:20px;">→</div>
+            </div>
+        `).join('');
+    }
+
+    // ============================================================
+    // 11. ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+
+    function renderAll() {
+        renderCategoryTabs();
+        renderPopular();
+        renderMenu();
+        renderCart();
+        renderProfile();
+        updateBadge();
+
+        // Показываем главную страницу
+        navigateTo('pageHome');
+    }
+
+    // Telegram WebApp
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.expand();
+        const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+        if (tgUser) {
+            document.getElementById('authName').value = tgUser.first_name || '';
+            document.getElementById('authSurname').value = tgUser.last_name || '';
+        }
+    }
+
+    console.log('🍷 Terassa Restaurant Mini App загружен!');
+</script>
+
 </body>
 </html>
