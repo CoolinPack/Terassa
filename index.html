@@ -533,15 +533,9 @@
                 <span class="icon">📱</span>
                 <p>Для входа в приложение необходимо поделиться номером телефона</p>
 
-                <!-- Кнопка для Telegram -->
-                <button class="phone-btn" id="telegramPhoneBtn" onclick="requestPhone()">
+                <button class="phone-btn" onclick="requestPhone()">
                     📱 Поделиться номером
                     <span class="sub">Telegram отправит ваш номер</span>
-                </button>
-
-                <!-- Кнопка для браузера (только для тестов) -->
-                <button class="phone-btn" id="browserPhoneBtn" style="display:none;background:#6c757d;margin-top:8px;" onclick="manualPhone()">
-                    ✏️ Ввести номер вручную (тест)
                 </button>
 
                 <p style="font-size:12px;color:#aaa;margin-top:12px;">Ваш номер будет использован только для связи с рестораном</p>
@@ -566,7 +560,6 @@
         </div>
     </div>
 </div>
-
 <!-- ===== ОСНОВНОЕ ПРИЛОЖЕНИЕ ===== -->
 <div id="app" style="display:none;">
 
