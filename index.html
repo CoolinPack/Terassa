@@ -179,29 +179,6 @@
         .auth-box input:focus, .auth-box select:focus { border-color: var(--primary); }
         .auth-box select { appearance: none; cursor: pointer; }
 
-        .phone-request {
-            text-align: center;
-            padding: 10px 0;
-        }
-        .phone-request .icon { font-size: 56px; display: block; margin-bottom: 12px; }
-        .phone-request p { color: #666; margin-bottom: 16px; font-size: 14px; line-height: 1.6; }
-
-        .phone-btn {
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            transition: 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-        .phone-btn:active { transform: scale(0.97); }
-        .phone-btn .sub { font-weight: 400; font-size: 13px; opacity: 0.8; display: block; margin-top: 4px; }
-
         /* ПОИСК */
         .search-box {
             width: 100%;
@@ -520,46 +497,29 @@
 </head>
 <body>
 
-<!-- ===== АВТОРИЗАЦИЯ ===== -->
+<!-- ===== АВТОРИЗАЦИЯ (МИНИ-АНКЕТА) ===== -->
 <div id="authScreen" class="auth-screen">
     <div class="auth-box">
         <div style="text-align:center;font-size:48px;margin-bottom:4px;">🍷</div>
         <h1>Terassa</h1>
         <p class="sub">Ресторан</p>
 
-        <!-- ШАГ 1: ЗАПРОС НОМЕРА -->
-        <div id="phoneRequestStep">
-            <div class="phone-request">
-                <span class="icon">📱</span>
-                <p>Для входа в приложение необходимо поделиться номером телефона</p>
+        <p style="text-align:center;color:#888;font-size:14px;margin-bottom:20px;">Заполните анкету для входа</p>
 
-                <button class="phone-btn" onclick="requestPhone()">
-                    📱 Поделиться номером
-                    <span class="sub">Telegram отправит ваш номер</span>
-                </button>
+        <input type="text" id="authName" placeholder="Имя" />
+        <input type="text" id="authSurname" placeholder="Фамилия" />
+        <input type="date" id="authBirth" placeholder="Дата рождения" />
+        <select id="authGender">
+            <option value="">Пол</option>
+            <option value="Мужской">Мужской</option>
+            <option value="Женский">Женский</option>
+        </select>
 
-                <p style="font-size:12px;color:#aaa;margin-top:12px;">Ваш номер будет использован только для связи с рестораном</p>
-            </div>
-        </div>
-
-        <!-- ШАГ 2: РЕГИСТРАЦИЯ -->
-        <div id="registrationStep" style="display:none;">
-            <p style="text-align:center;color:var(--success);font-weight:600;margin-bottom:16px;">✅ Номер получен!</p>
-            <p style="text-align:center;color:#888;font-size:14px;margin-bottom:16px;">Заполните данные для регистрации</p>
-
-            <input type="text" id="authName" placeholder="Имя" />
-            <input type="text" id="authSurname" placeholder="Фамилия" />
-            <input type="date" id="authBirth" placeholder="Дата рождения" />
-            <select id="authGender">
-                <option value="">Пол</option>
-                <option value="Мужской">Мужской</option>
-                <option value="Женский">Женский</option>
-            </select>
-
-            <button class="btn-primary" onclick="authUser()">Завершить регистрацию</button>
-        </div>
+        <button class="btn-primary" onclick="authUser()">Войти</button>
+        <p style="text-align:center;font-size:12px;color:#aaa;margin-top:16px;">Нажимая кнопку, вы соглашаетесь с условиями</p>
     </div>
 </div>
+
 <!-- ===== ОСНОВНОЕ ПРИЛОЖЕНИЕ ===== -->
 <div id="app" style="display:none;">
 
@@ -648,22 +608,19 @@
 
 <script>
     // ============================================================
-    // 1. МЕНЮ
+    // 1. МЕНЮ (полное)
     // ============================================================
 
     const MENU = [
-        // САЛАТЫ
         { id: 1, name: 'Тартар из тунца с авокадо', price: 160000, category: 'Салаты', ingredients: ['тунец', 'авокадо', 'красный лук', 'оливковое масло', 'специи'], popular: true },
         { id: 2, name: 'Цезарь с креветками', price: 150000, category: 'Салаты', ingredients: ['листья салата', 'креветки', 'томаты черри', 'перепелиные яйца', 'хрустящие сухарики', 'соус Цезарь'], popular: true },
         { id: 3, name: 'Цезарь с курицей', price: 130000, category: 'Салаты', ingredients: ['листья салата', 'куриное филе', 'томаты черри', 'перепелиные яйца', 'хрустящие сухарики', 'соус Цезарь'], popular: false },
         { id: 4, name: 'Тайский салат с креветками', price: 150000, category: 'Салаты', ingredients: ['креветки', 'авокадо', 'манго', 'огурец', 'болгарский перец', 'кинза', 'кунжут', 'специи'], popular: false },
         { id: 5, name: 'Тёплый салат с хрустящим баклажаном', price: 120000, category: 'Салаты', ingredients: ['хрустящий баклажан', 'болгарский перец', 'крем-чиз', 'кинза', 'кунжут', 'специи'], popular: false },
-        // ХОЛОДНЫЕ ЗАКУСКИ
         { id: 6, name: 'Овощная ассорти', price: 70000, category: 'Холодные закуски', ingredients: ['овощи сезонные'], popular: false },
         { id: 7, name: 'Сырная тарелка (гауда, пармезан, дорблю)', price: 190000, category: 'Холодные закуски', ingredients: ['гауда', 'пармезан', 'дорблю'], popular: false },
         { id: 8, name: 'Сало с горчицей и хлебом', price: 80000, category: 'Холодные закуски', ingredients: ['сало', 'горчица', 'хлеб'], popular: false },
         { id: 9, name: 'Закуска под рюмочку', price: 80000, category: 'Холодные закуски', ingredients: ['огурцы маринованные', 'домашнее сало', 'маринованные грибы'], popular: false },
-        // ГОРЯЧИЕ БЛЮДА
         { id: 10, name: 'Жульен с грибами', price: 80000, category: 'Горячие блюда', ingredients: ['грибной жульен', 'соус бешамель', 'сыр моцарелла', 'пармезан', 'мускатный орех'], popular: false },
         { id: 11, name: 'Жульен с курицей', price: 90000, category: 'Горячие блюда', ingredients: ['жульен с курицей', 'соус бешамель', 'сыр моцарелла', 'пармезан', 'мускатный орех'], popular: false },
         { id: 12, name: 'Жульен с креветкой', price: 100000, category: 'Горячие блюда', ingredients: ['жульен с креветкой', 'соус бешамель', 'сыр моцарелла', 'пармезан', 'мускатный орех'], popular: false },
@@ -673,25 +630,20 @@
         { id: 16, name: 'Свинина по-французски', price: 160000, category: 'Горячие блюда', ingredients: ['отбивная свинина', 'картофельный гратен', 'помидор', 'соус бешамель', 'сыр'], popular: false },
         { id: 17, name: 'Отварной картофель с малосольной селедочкой', price: 180000, category: 'Горячие блюда', ingredients: ['картофель', 'сельдь', 'маринованный лук'], popular: false },
         { id: 18, name: 'Жареный гребешок с креветкой под азиатским соусом', price: 250000, category: 'Горячие блюда', ingredients: ['морской гребешок', 'креветки', 'азиатский соус'], popular: true },
-        // СВИНЫЕ РЁБРА
         { id: 19, name: 'Свиные рёбра в медово-горчичном соусе', price: 250000, category: 'Свиные рёбра', ingredients: ['свиные рёбра', 'медово-горчичный соус', 'кетчуп', 'кисло-сладкий соус'], popular: true },
         { id: 20, name: 'Свиные рёбра в соусе Терияки', price: 250000, category: 'Свиные рёбра', ingredients: ['свиные рёбра', 'соус терияки', 'картофель по-деревенски', 'кунжут'], popular: false },
         { id: 21, name: 'Свиные рёбра в соусе Барбекю', price: 250000, category: 'Свиные рёбра', ingredients: ['свиные рёбра', 'соус барбекю', 'картофель по-деревенски'], popular: false },
-        // ГОВЯЖЬИ РЁБРА
         { id: 22, name: 'Говяжьи рёбра в медово-горчичном соусе', price: 700000, category: 'Говяжьи рёбра', ingredients: ['говяжьи рёбра', 'медово-горчичный соус', 'картофель по-деревенски', 'кетчуп'], popular: true },
         { id: 23, name: 'Говяжьи рёбра в соусе Терияки', price: 700000, category: 'Говяжьи рёбра', ingredients: ['говяжьи рёбра', 'соус терияки', 'картофель по-деревенски', 'кунжут'], popular: false },
         { id: 24, name: 'Говяжьи рёбра в соусе Барбекю', price: 700000, category: 'Говяжьи рёбра', ingredients: ['говяжьи рёбра', 'соус барбекю', 'картофель по-деревенски'], popular: false },
-        // ГАРНИРЫ
         { id: 25, name: 'Картофель по-деревенски', price: 80000, category: 'Гарниры', ingredients: ['румяные картофельные дольки', 'специи'], popular: false },
         { id: 26, name: 'Картофель фри', price: 70000, category: 'Гарниры', ingredients: ['хрустящий картофель фри'], popular: false },
         { id: 27, name: 'Нежное гороховое пюре', price: 80000, category: 'Гарниры', ingredients: ['домашнее гороховое пюре', 'кремовая текстура'], popular: false },
-        // ПЕЛЬМЕНИ И ВАРЕНИКИ
         { id: 28, name: 'Домашние пельмени с говядиной', price: 120000, category: 'Пельмени и вареники', ingredients: ['говядина', 'тесто'], popular: false },
         { id: 29, name: 'Домашние пельмени со свининой', price: 110000, category: 'Пельмени и вареники', ingredients: ['свинина', 'тесто'], popular: false },
         { id: 30, name: 'Домашние пельмени с курицей', price: 100000, category: 'Пельмени и вареники', ingredients: ['курица', 'тесто'], popular: false },
         { id: 31, name: 'Домашние вареники с картофелем', price: 100000, category: 'Пельмени и вареники', ingredients: ['картофель', 'тесто'], popular: false },
         { id: 32, name: 'Вареники с лососем, креветкой и сливочным сыром', price: 130000, category: 'Пельмени и вареники', ingredients: ['лосось', 'креветка', 'сливочный сыр', 'тесто'], popular: true },
-        // ЗАКУСКИ К ПИВУ
         { id: 33, name: 'Копчёная перепёлка (2 шт.)', price: 120000, category: 'Закуски к пиву', ingredients: ['копчёная перепёлка'], popular: false },
         { id: 34, name: 'Джерки из говядины', price: 120000, category: 'Закуски к пиву', ingredients: ['вяленая говядина'], popular: false },
         { id: 35, name: 'Джерки из курицы', price: 100000, category: 'Закуски к пиву', ingredients: ['вяленая курица'], popular: false },
@@ -699,19 +651,15 @@
         { id: 37, name: 'Скумбрия холодного копчения', price: 180000, category: 'Закуски к пиву', ingredients: ['скумбрия холодного копчения'], popular: false },
         { id: 38, name: 'Филе сибаса холодного копчения (50 г)', price: 120000, category: 'Закуски к пиву', ingredients: ['филе сибаса холодного копчения'], popular: false },
         { id: 39, name: 'Мойва холодного копчения', price: 120000, category: 'Закуски к пиву', ingredients: ['мойва холодного копчения'], popular: false },
-        // ДЕСЕРТЫ
         { id: 40, name: 'Наполеон', price: 70000, category: 'Десерты', ingredients: ['слоёные коржи', 'заварной крем'], popular: true },
         { id: 41, name: 'Медовик', price: 70000, category: 'Десерты', ingredients: ['медовые коржи', 'сметанный крем'], popular: false },
         { id: 42, name: 'Классический чизкейк', price: 70000, category: 'Десерты', ingredients: ['сливочный чизкейк', 'песочная основа'], popular: false },
-        // ВОДКА
         { id: 43, name: 'Водка Абсолют 40 гр.', price: 60000, category: 'Водка', ingredients: ['водка Абсолют'], popular: false },
         { id: 44, name: 'Водка Абсолют 100 гр.', price: 130000, category: 'Водка', ingredients: ['водка Абсолют'], popular: false },
         { id: 45, name: 'Водка Смирнов 40 гр.', price: 50000, category: 'Водка', ingredients: ['водка Смирнов'], popular: false },
         { id: 46, name: 'Водка Смирнов 100 гр.', price: 100000, category: 'Водка', ingredients: ['водка Смирнов'], popular: false },
-        // РОМ
         { id: 47, name: 'Ром Бакарди 50 гр.', price: 80000, category: 'Ром', ingredients: ['ром Бакарди'], popular: false },
         { id: 48, name: 'Ром Бакарди 100 гр.', price: 150000, category: 'Ром', ingredients: ['ром Бакарди'], popular: false },
-        // ВИСКИ
         { id: 49, name: 'Виски Балантайс 50 гр.', price: 80000, category: 'Виски', ingredients: ['виски Балантайс'], popular: false },
         { id: 50, name: 'Виски Балантайс 100 гр.', price: 150000, category: 'Виски', ingredients: ['виски Балантайс'], popular: false },
         { id: 51, name: 'Джек Дэниелс 50 гр.', price: 80000, category: 'Виски', ingredients: ['виски Джек Дэниелс'], popular: false },
@@ -720,12 +668,10 @@
         { id: 54, name: 'Джин Лондон 50 гр.', price: 80000, category: 'Виски', ingredients: ['джин Лондон'], popular: false },
         { id: 55, name: 'Ликер Егермейстер 50 гр.', price: 90000, category: 'Виски', ingredients: ['ликер Егермейстер'], popular: false },
         { id: 56, name: 'Мартини 50 гр.', price: 80000, category: 'Виски', ingredients: ['мартини'], popular: false },
-        // ВИНО
         { id: 57, name: 'Вино красное сухое (Чили) 150 гр.', price: 120000, category: 'Вино', ingredients: ['вино красное сухое Чили'], popular: false },
         { id: 58, name: 'Вино белое сухое (Чили) 150 гр.', price: 120000, category: 'Вино', ingredients: ['вино белое сухое Чили'], popular: false },
         { id: 59, name: 'Вино красное сухое 750 гр (Чили)', price: 400000, category: 'Вино', ingredients: ['вино красное сухое Чили'], popular: false },
         { id: 60, name: 'Вино белое сухое 750 гр (Чили)', price: 400000, category: 'Вино', ingredients: ['вино белое сухое Чили'], popular: false },
-        // КОКТЕЙЛИ
         { id: 61, name: 'Aperol Spritz', price: 140000, category: 'Коктейли', ingredients: ['Aperol', 'просекко', 'содовая'], popular: true },
         { id: 62, name: 'Gin Tonik', price: 140000, category: 'Коктейли', ingredients: ['джин', 'тоник'], popular: false },
         { id: 63, name: 'Cuba Libre', price: 140000, category: 'Коктейли', ingredients: ['ром', 'кола', 'лайм'], popular: false },
@@ -742,10 +688,8 @@
         { id: 74, name: 'Tequila Sour', price: 140000, category: 'Коктейли', ingredients: ['текила', 'лимон', 'сахар'], popular: false },
         { id: 75, name: 'Basil Smash', price: 140000, category: 'Коктейли', ingredients: ['джин', 'базилик', 'лимон', 'сахар'], popular: false },
         { id: 76, name: 'Blue Laguna', price: 140000, category: 'Коктейли', ingredients: ['водка', 'блю кюрасао', 'содовая'], popular: false },
-        // БЕЗАЛКОГОЛЬНЫЕ
         { id: 77, name: 'Pina Colada (безалкогольный)', price: 80000, category: 'Безалкогольные коктейли', ingredients: ['кокосовое молоко', 'ананас', 'сливки'], popular: false },
         { id: 78, name: 'Mojito (безалкогольный)', price: 80000, category: 'Безалкогольные коктейли', ingredients: ['мята', 'лайм', 'сахар', 'содовая'], popular: false },
-        // НАПИТКИ
         { id: 79, name: 'Coca Cola', price: 25000, category: 'Напитки', ingredients: [], popular: false },
         { id: 80, name: 'Fanta', price: 25000, category: 'Напитки', ingredients: [], popular: false },
         { id: 81, name: 'Sprite', price: 25000, category: 'Напитки', ingredients: [], popular: false },
@@ -763,7 +707,6 @@
         { id: 93, name: 'Сок Вишнёвый 200 мл', price: 30000, category: 'Напитки', ingredients: [], popular: false },
         { id: 94, name: 'Сок Ананасовый 200 мл', price: 30000, category: 'Напитки', ingredients: [], popular: false },
         { id: 95, name: 'Сок Яблочный 200 мл', price: 30000, category: 'Напитки', ingredients: [], popular: false },
-        // КОФЕ, ЧАЙ
         { id: 96, name: 'Эспрессо', price: 40000, category: 'Кофе и чай', ingredients: ['кофе'], popular: false },
         { id: 97, name: 'Капучино', price: 45000, category: 'Кофе и чай', ingredients: ['кофе', 'молоко'], popular: false },
         { id: 98, name: 'Латте', price: 50000, category: 'Кофе и чай', ingredients: ['кофе', 'молоко'], popular: false },
@@ -779,8 +722,7 @@
     // 2. СОСТОЯНИЕ
     // ============================================================
 
-    // ЗДЕСЬ ВСТАВЬ СВОЙ ID
-    const ADMIN_ID = 8166237921;
+    const ADMIN_ID = 8166237921; // ТВОЙ TELEGRAM ID (для админ-панели)
 
     let cart = [];
     let user = null;
@@ -788,68 +730,12 @@
     let searchQuery = '';
     let orderHistory = [];
     let stoppedItems = [];
-    let userPhone = null;
-    let userUsername = null;
 
     const CATEGORIES = ['Все', ...new Set(MENU.map(d => d.category))];
 
     // ============================================================
-    // 3. АВТОРИЗАЦИЯ (РАБОТАЕТ ВЕЗДЕ)
+    // 3. АВТОРИЗАЦИЯ (МИНИ-АНКЕТА)
     // ============================================================
-
-    // Проверяем, открыто ли приложение в Telegram
-    function isTelegramWebApp() {
-        return window.Telegram?.WebApp !== undefined;
-    }
-
-    // Инициализация кнопок
-    function initAuthButtons() {
-        const isTelegram = isTelegramWebApp();
-        
-        // В Telegram показываем кнопку "Поделиться номером"
-        // В браузере показываем "Ввести вручную"
-        document.getElementById('telegramPhoneBtn').style.display = isTelegram ? 'block' : 'none';
-        document.getElementById('browserPhoneBtn').style.display = isTelegram ? 'none' : 'block';
-        
-        // Если открыто в Telegram, но API не готов — пробуем инициализировать
-        if (isTelegram) {
-            try {
-                window.Telegram.WebApp.expand();
-            } catch(e) {}
-        }
-    }
-
-    function requestPhone() {
-        if (!isTelegramWebApp()) {
-            alert('❌ Эта функция доступна только в Telegram.\n\nИспользуйте кнопку "Ввести номер вручную" для теста.');
-            return;
-        }
-
-        try {
-            window.Telegram.WebApp.requestContact((contact) => {
-                if (contact?.phone_number) {
-                    userPhone = contact.phone_number;
-                    document.getElementById('phoneRequestStep').style.display = 'none';
-                    document.getElementById('registrationStep').style.display = 'block';
-                    
-                    const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-                    userUsername = tgUser?.username || null;
-                }
-            });
-        } catch(e) {
-            alert('❌ Ошибка запроса номера.\nПопробуйте обновить страницу.');
-            console.error(e);
-        }
-    }
-
-    function manualPhone() {
-        const phone = prompt('Введите номер телефона для теста:', '+7');
-        if (phone && phone.trim()) {
-            userPhone = phone.trim();
-            document.getElementById('phoneRequestStep').style.display = 'none';
-            document.getElementById('registrationStep').style.display = 'block';
-        }
-    }
 
     function authUser() {
         const name = document.getElementById('authName').value.trim();
@@ -862,28 +748,26 @@
             return;
         }
 
-        if (!userPhone) {
-            alert('Сначала поделитесь номером телефона');
-            return;
-        }
-
-        // Получаем username если есть
-        if (!userUsername && isTelegramWebApp()) {
-            try {
-                const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-                userUsername = tgUser?.username || null;
-            } catch(e) {}
+        // Получаем username из Telegram если есть
+        let username = null;
+        if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+            username = window.Telegram.WebApp.initDataUnsafe.user.username || null;
         }
 
         user = {
-            phone: userPhone,
             name: name,
             surname: surname,
             birthDate: birth,
             gender: gender || 'Не указан',
-            username: userUsername,
-            isAdmin: userPhone === ADMIN_ID || false
+            username: username,
+            // Для админа используем специальный ключ (можно установить вручную)
+            isAdmin: false // Админ определяется по отдельному признаку
         };
+
+        // Если хочешь сделать админа по имени или другому признаку
+        if (name === 'Admin' || name === 'Админ') {
+            user.isAdmin = true;
+        }
 
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
@@ -893,6 +777,30 @@
         }
         
         renderAll();
+        saveUserToStorage();
+    }
+
+    function saveUserToStorage() {
+        try {
+            localStorage.setItem('terassa_user', JSON.stringify(user));
+        } catch(e) {}
+    }
+
+    function loadUserFromStorage() {
+        try {
+            const data = localStorage.getItem('terassa_user');
+            if (data) {
+                const savedUser = JSON.parse(data);
+                // Не восстанавливаем isAdmin из localStorage (безопасность)
+                user = savedUser;
+                user.isAdmin = false;
+                if (user.name === 'Admin' || user.name === 'Админ') {
+                    user.isAdmin = true;
+                }
+                return true;
+            }
+        } catch(e) {}
+        return false;
     }
 
     // ============================================================
@@ -1169,7 +1077,6 @@
         const orderData = {
             user_name: user.name,
             user_surname: user.surname,
-            user_phone: user.phone,
             user_birth_year: user.birthDate || '',
             user_gender: user.gender || '',
             username: user.username || 'Не указан',
@@ -1246,13 +1153,11 @@
             <div style="text-align:center;padding:12px 0 16px;">
                 <div style="font-size:48px;">👨‍🍳</div>
                 <h3 style="font-size:20px;">${user.name} ${user.surname}</h3>
-                <p style="color:#888;">${user.phone}</p>
                 ${user.isAdmin ? '<p style="color:var(--gold);font-weight:600;font-size:13px;">👑 Администратор</p>' : ''}
                 ${user.username ? `<p style="color:#888;font-size:13px;">@${user.username}</p>` : '<p style="color:var(--danger);font-size:13px;">⚠️ Нет username</p>'}
             </div>
             <div class="profile-row"><span class="label">Имя</span><span class="value">${user.name}</span></div>
             <div class="profile-row"><span class="label">Фамилия</span><span class="value">${user.surname}</span></div>
-            <div class="profile-row"><span class="label">Телефон</span><span class="value">${user.phone}</span></div>
             <div class="profile-row"><span class="label">Дата рождения</span><span class="value">${birthDisplay}</span></div>
             <div class="profile-row"><span class="label">Пол</span><span class="value">${user.gender || 'Не указан'}</span></div>
             ${user.birthDate ? `<div style="margin-top:16px;padding:12px;background:#fef9e7;border-radius:12px;text-align:center;color:#b7950b;">🎂 Скидка на день рождения (активируется в ваш день)</div>` : ''}
@@ -1391,25 +1296,34 @@
         navigateTo('pageHome');
     }
 
+    // Проверяем сохранённого пользователя
+    if (loadUserFromStorage()) {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        if (user.isAdmin) {
+            document.getElementById('adminIndicator').style.display = 'inline';
+        }
+        renderAll();
+    }
+
     // Telegram WebApp
     if (window.Telegram?.WebApp) {
         try {
             window.Telegram.WebApp.expand();
             const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
             if (tgUser) {
-                document.getElementById('authName').value = tgUser.first_name || '';
-                document.getElementById('authSurname').value = tgUser.last_name || '';
-                userUsername = tgUser.username || null;
+                if (!document.getElementById('authName').value) {
+                    document.getElementById('authName').value = tgUser.first_name || '';
+                }
+                if (!document.getElementById('authSurname').value) {
+                    document.getElementById('authSurname').value = tgUser.last_name || '';
+                }
             }
         } catch(e) {}
     }
 
-    // Инициализация кнопок авторизации
-    initAuthButtons();
-
     console.log('🍷 Terassa Restaurant Mini App загружен!');
-    console.log('👑 Админ ID:', ADMIN_ID);
-    console.log('📱 Режим:', isTelegramWebApp() ? 'Telegram WebApp' : 'Браузер (тест)');
+    console.log('👑 Админ режим:', user?.isAdmin || false);
 </script>
 
 </body>
