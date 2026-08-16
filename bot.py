@@ -7,8 +7,11 @@ from config import config
 from database import db
 from menu_data import init_menu, get_menu_json
 from admin_upload import ImageUploader
+from flask import Flask, request, jsonify
+import threading
 
-# Инициализация
+# ============ ИНИЦИАЛИЗАЦИЯ ============
+
 bot = telebot.TeleBot(config.BOT_TOKEN)
 uploader = ImageUploader(bot)
 
@@ -18,13 +21,32 @@ init_menu()
 # Временное хранилище для загрузки фото
 upload_sessions = {}
 
+# Flask приложение
+app = Flask(__name__)
+
+# ============ ЭНДПОИНТЫ ДЛЯ RENDER HEALTH CHECK ============
+
+@app.route('/')
+def home():
+    return jsonify({
+        'status': 'ok',
+        'message': 'Terassa Bot is running',
+        'version': '1.0.0'
+    })
+
+@app.route('/healthz')
+def health():
+    return jsonify({'status': 'healthy'}), 200
+
 # ============ КОМАНДЫ БОТА ============
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     markup = InlineKeyboardMarkup()
     
-    web_app_url = "https://your-domain.com"  # Замени на свой URL
+    # 🔥 СЮДА ВСТАВЬ СВОЙ URL MINI APP (GitHub Pages)
+    web_app_url = "https://coolinpack.github.io/Terassa/"
+    
     web_app_btn = InlineKeyboardButton(
         text="🍽 Открыть меню",
         web_app=WebAppInfo(url=web_app_url)
@@ -47,12 +69,14 @@ def send_help(message):
 /start - Открыть меню
 /orders - Просмотр заказов (админ)
 /upload - Загрузить картинку (админ)
+/add_dish - Добавить блюдо (админ)
 /help - Помощь
 
 👨‍🍳 *Для администратора:*
 • Заказы приходят автоматически
 • /orders - список заказов
 • /upload - загрузка картинок
+• /add_dish - добавить блюдо
     """
     bot.reply_to(message, help_text, parse_mode="Markdown")
 
@@ -96,6 +120,10 @@ def upload_image_command(message):
         return
     
     menu = db.get_menu()
+    
+    if not menu:
+        bot.reply_to(message, "📭 Меню пусто. Сначала добавьте блюда: /add_dish")
+        return
     
     markup = InlineKeyboardMarkup(row_width=2)
     for dish in menu:
@@ -198,7 +226,7 @@ def process_add_dish(message):
     try:
         parts = message.text.replace('/add_dish ', '').split(' | ')
         if len(parts) < 3:
-            bot.reply_to(message, "❌ Недостаточно данных")
+            bot.reply_to(message, "❌ Недостаточно данных. Формат: Название | Цена | Категория | Ингредиенты | Описание")
             return
         
         dish_data = {
@@ -224,11 +252,6 @@ def process_add_dish(message):
         bot.reply_to(message, f"❌ Ошибка: {str(e)}")
 
 # ============ ОБРАБОТКА ЗАКАЗОВ (WEBHOOK) ============
-
-from flask import Flask, request, jsonify
-import threading
-
-app = Flask(__name__)
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -327,14 +350,13 @@ def handle_status_callback(call):
             call.message.message_id
         )
         
-        # Отправляем уведомление клиенту (если есть chat_id)
-        
     except Exception as e:
         bot.answer_callback_query(call.id, f"Ошибка: {str(e)}")
 
 # ============ ЗАПУСК ============
 
 def run_bot():
+    print("🤖 Бот запущен и слушает команды...")
     bot.infinity_polling()
 
 if __name__ == "__main__":
@@ -343,4 +365,5 @@ if __name__ == "__main__":
     bot_thread.start()
     
     # Запускаем Flask для вебхуков
+    print("🌐 Flask сервер запущен на порту 5000")
     app.run(host='0.0.0.0', port=5000)
