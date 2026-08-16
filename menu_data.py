@@ -1,4 +1,5 @@
 from database import db
+import sqlite3
 
 # Начальные данные меню
 MENU_DATA = [
