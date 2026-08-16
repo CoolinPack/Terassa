@@ -259,7 +259,7 @@ def webhook():
         data = request.json
         
         # Проверяем обязательные поля
-        required = ['user_name', 'user_surname', 'user_phone', 'items', 'total', 'delivery_type']
+        required = ['user_name', 'user_surname', 'items', 'total', 'delivery_type']
         for field in required:
             if field not in data:
                 return jsonify({'error': f'Missing {field}'}), 400
@@ -278,7 +278,6 @@ def webhook():
 🆕 *НОВЫЙ ЗАКАЗ # {order_id}*
 
 👤 *Клиент:* {data['user_name']} {data['user_surname']}
-📞 *Телефон:* {data['user_phone']}
 🎂 *Год рождения:* {data.get('user_birth_year', 'не указан')}
 
 📦 *Тип:* {delivery_text}
