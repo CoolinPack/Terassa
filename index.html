@@ -709,6 +709,156 @@
             .bottom-nav { max-width: 100%; }
             .modal-overlay { padding: 0; }
         }
+    
+/* ===== TERASSA REDESIGN ===== */
+:root{
+    --primary:#7b2f24;
+    --primary-dark:#5d2119;
+    --primary-light:#9b4a3b;
+    --secondary:#b68b55;
+    --cream:#f7f4ef;
+    --cream-2:#eee9e1;
+    --gold:#a87b43;
+    --sage:#65705a;
+    --ink:#201d1a;
+    --muted:#77716a;
+    --line:#ded8cf;
+    --danger:#b33a32;
+    --success:#47704c;
+    --shadow:0 3px 14px rgba(35,28,22,.055);
+    --shadow-lg:0 18px 50px rgba(35,28,22,.12);
+    --radius:16px;
+}
+body{background:#f5f2ed;color:var(--ink);}
+.page{padding:24px 16px 14px;min-height:calc(100vh - 84px);}
+.page-title{font-family:'Inter',sans-serif;font-size:24px;letter-spacing:-.4px;}
+.bottom-nav{
+    background:rgba(255,255,255,.96);
+    border-top:1px solid #e5dfd6;
+    box-shadow:0 -8px 30px rgba(30,24,20,.06);
+    padding:8px 8px calc(8px + env(safe-area-inset-bottom,6px));
+}
+.bottom-nav button{
+    min-width:72px;padding:9px 12px;border-radius:12px;font-size:12px;
+    font-weight:600;color:#8b847c;
+}
+.bottom-nav button.active{background:#f0ebe4;color:var(--primary);}
+.bottom-nav button .icon{display:none;}
+.nav-label{display:block;}
+.badge{top:2px;right:2px;}
+
+.home-header{margin-bottom:22px;}
+.home-brand{font-family:'Playfair Display',serif;font-size:31px;font-weight:700;letter-spacing:-.7px;}
+.home-subtitle{margin-top:2px;font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);}
+.home-links{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:26px;}
+.home-links button{
+    border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px 8px;
+    font:600 12px 'Inter',sans-serif;color:var(--ink);box-shadow:var(--shadow);cursor:pointer;
+}
+.home-links button:active{transform:scale(.98);background:var(--cream-2);}
+.section-heading{margin-bottom:11px;}
+.section-heading h3{font-size:18px;letter-spacing:-.25px;}
+.popular-card{
+    width:100%;border:1px solid #e7e1d9;background:#fff;border-radius:15px;
+    padding:16px 15px;margin-bottom:9px;display:flex;align-items:center;gap:12px;
+    text-align:left;box-shadow:var(--shadow);cursor:pointer;
+}
+.popular-card:active{transform:scale(.99);}
+.popular-info{min-width:0;flex:1;}
+.pc-name{font-size:14px;font-weight:650;line-height:1.35;}
+.pc-price{margin-top:5px;color:var(--primary);font-size:13px;font-weight:750;}
+.pc-arrow{color:#a39b92;font-size:19px;}
+
+.menu-header{margin-bottom:17px;}
+.eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.6px;color:var(--gold);margin-bottom:4px;}
+.menu-title{font-size:24px;line-height:1.15;letter-spacing:-.5px;margin:0 0 16px;font-weight:750;}
+.search-box-wrap{margin-bottom:12px;}
+.search-box-wrap .si{width:14px;height:14px;border:1.7px solid #8b847c;border-radius:50%;left:16px;}
+.search-box-wrap .si:after{content:"";position:absolute;width:6px;height:1.7px;background:#8b847c;right:-5px;bottom:-2px;transform:rotate(45deg);}
+.search-box{border:1px solid var(--line);border-radius:13px;background:#fff;height:48px;padding:0 15px 0 42px;margin-bottom:0;box-shadow:0 2px 10px rgba(30,24,20,.025);}
+.category-select-wrap{margin:0 0 18px;position:relative;z-index:20;}
+.category-select-wrap label{display:block;font-size:10.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.3px;margin:0 0 7px 2px;}
+.category-dropdown{position:relative;}
+.category-trigger{width:100%;min-height:54px;border:1px solid #ddd5ca;border-radius:16px;background:linear-gradient(180deg,#fff 0%,#fdfaf6 100%);padding:0 48px 0 16px;font:700 14px 'Inter',sans-serif;color:var(--ink);text-align:left;cursor:pointer;position:relative;transition:transform .18s ease,box-shadow .22s ease,border-color .22s ease;box-shadow:0 7px 20px rgba(50,38,28,.07),inset 0 1px 0 rgba(255,255,255,.9);}
+.category-trigger::after{content:"";position:absolute;right:17px;top:50%;width:8px;height:8px;border-right:1.8px solid #756e67;border-bottom:1.8px solid #756e67;transform:translateY(-65%) rotate(45deg);transition:transform .25s ease;}
+.category-dropdown.open .category-trigger{border-color:#cdbda9;box-shadow:0 10px 28px rgba(50,38,28,.11);}
+.category-dropdown.open .category-trigger::after{transform:translateY(-25%) rotate(225deg);}
+.category-trigger:active{transform:scale(.992);}
+.category-menu{position:absolute;left:0;right:0;top:calc(100% + 8px);background:rgba(255,255,255,.98);border:1px solid #e0d8ce;border-radius:17px;padding:7px;box-shadow:0 18px 42px rgba(39,30,23,.16);max-height:320px;overflow:auto;opacity:0;visibility:hidden;transform:translateY(-8px) scale(.985);transform-origin:top center;transition:opacity .2s ease,transform .25s cubic-bezier(.2,.8,.2,1),visibility .25s;scrollbar-width:thin;}
+.category-dropdown.open .category-menu{opacity:1;visibility:visible;transform:translateY(0) scale(1);}
+.category-option{width:100%;border:0;background:transparent;color:#4d4741;text-align:left;padding:12px 12px;border-radius:11px;font:600 13.5px 'Inter',sans-serif;cursor:pointer;transition:background .16s ease,color .16s ease,transform .16s ease;}
+.category-option:hover{background:#f4eee7;color:var(--primary);}
+.category-option:active{transform:scale(.985);}
+.category-option.active{background:linear-gradient(135deg,#8b3a2b,#6f2d20);color:#fff;box-shadow:0 5px 12px rgba(111,45,32,.18);}
+.category-tabs{display:none;}
+
+.feature-modal{position:fixed;inset:0;background:rgba(25,20,16,.42);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease;z-index:250;}
+.feature-modal.open{opacity:1;visibility:visible;}
+.feature-modal-box{width:min(430px,100%);background:#fff;border-radius:24px 24px 0 0;padding:26px 20px calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(22px);transition:transform .28s cubic-bezier(.2,.8,.2,1);box-shadow:0 -18px 50px rgba(20,15,12,.18);}
+.feature-modal.open .feature-modal-box{transform:translateY(0);}
+.feature-modal-kicker{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:7px;}
+.feature-modal-title{font-size:22px;font-weight:750;margin-bottom:7px;}
+.feature-modal-text{font-size:14px;line-height:1.55;color:var(--muted);}
+.feature-modal-close{margin-top:18px;width:100%;border:0;border-radius:13px;padding:13px;background:#f1ece5;color:var(--ink);font:700 14px 'Inter',sans-serif;}
+
+.menu-note{background:#f8f3ec;border:1px solid #e7ddd0;border-radius:13px;padding:12px 13px;margin:0 0 12px;color:#625a51;font-size:12.5px;line-height:1.5;}
+
+.dish-item{
+    background:#fff;border:1px solid #e8e2da;border-radius:15px;padding:15px 13px;
+    margin-bottom:9px;box-shadow:var(--shadow);align-items:center;
+}
+.dish-main{gap:0;}
+.dish-info{width:100%;}
+.dish-topline{display:flex;align-items:flex-start;gap:7px;}
+.dish-info h4{font-size:14px;line-height:1.38;font-weight:650;}
+.dish-info .price{font-size:13.5px;margin-top:5px;}
+.dish-icon{display:none!important;}
+.show-ingredients{
+    border:0;background:none;padding:0;margin-top:7px;
+    font:600 12px 'Inter',sans-serif;color:var(--sage);cursor:pointer;
+}
+.dish-actions{gap:6px;margin-left:10px;}
+.dish-actions .qty{min-width:24px;font-size:13px;}
+.dish-actions .qty-btn{
+    width:32px;height:32px;border-radius:10px;box-shadow:none;
+    font-size:18px;font-weight:500;background:#f0ebe4;color:var(--primary);
+}
+.dish-actions .qty-btn.plus{background:var(--primary);color:#fff;}
+.dish-actions .qty-btn:disabled{opacity:.35;background:#eee9e1;color:#827a72;}
+.stopped-badge{margin-left:0;}
+.admin-dish-controls{margin-top:8px;}
+.admin-dish-controls button{border-radius:8px;}
+
+.modal-box{padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));}
+.modal-box h3{font-size:20px;}
+.modal-box .ingredients-tags{gap:7px;}
+.modal-box .ing-tag{background:#f1ece5;border:1px solid #e4ddd4;border-radius:9px;}
+.ingredient-text{font-size:14px;line-height:1.65;color:var(--ink);background:#f8f4ee;border:1px solid #e7dfd5;border-radius:12px;padding:13px 14px;}
+.close-btn{background:var(--primary)!important;}
+
+.cart-item{padding:15px 0;}
+.cart-item .name{font-size:14px;}
+.cart-item .controls button{width:30px;height:30px;background:#f0ebe4;}
+.delivery-options button{height:48px;}
+.checkout-warning{
+    margin:14px 0 0;padding:13px 14px;border:1px solid #e3c98f;
+    background:#fbf6e9;border-radius:12px;color:#76602c;font-size:12px;line-height:1.5;
+}
+.checkout-warning strong{display:block;margin-bottom:3px;color:#5e4b20;font-size:12px;}
+.empty-mark{
+    width:36px;height:36px;border:1.5px solid #c9c1b7;border-radius:10px;margin:0 auto 12px;
+    position:relative;opacity:.65;
+}
+.empty-mark:after{content:"";position:absolute;left:8px;right:8px;top:17px;height:1px;background:#b8afa5;}
+.no-results{padding:45px 20px;}
+.no-results .empty-mark{margin-bottom:12px;}
+
+.profile-header{padding:2px 0 20px;}
+.profile-avatar{font-family:'Playfair Display',serif;font-size:30px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));}
+.birthday-box,.warning-box{display:none;}
+
+.auth-emblem{font-family:'Playfair Display',serif;font-size:30px;}
+
     </style>
 </head>
 <body>
@@ -716,7 +866,7 @@
 <!-- ===== АВТОРИЗАЦИЯ (МИНИ-АНКЕТА) ===== -->
 <div id="authScreen" class="auth-screen">
     <div class="auth-box">
-        <div class="auth-emblem">🍷</div>
+        <div class="auth-emblem">T</div>
         <h1 class="font-serif">Terassa</h1>
         <p class="sub">Ресторан</p>
 
@@ -752,65 +902,61 @@
     <!-- ГЛАВНАЯ -->
     <div id="pageHome" class="page active">
         <div class="home-header">
-            <div class="brand">
-                <div class="brand-icon">🍷</div>
-                <div>
-                    <span class="font-serif" style="font-size:22px;color:var(--ink);font-weight:700;">Terassa</span>
-                    <div class="greet">Добро пожаловать 👋</div>
-                </div>
+            <div>
+                <div class="home-brand">Terassa</div>
+                <div class="home-subtitle">Ресторан</div>
             </div>
-            <span id="adminIndicator" style="display:none;" class="admin-badge">👑 Админ</span>
+            <span id="adminIndicator" style="display:none;" class="admin-badge">Администратор</span>
         </div>
 
-        <div class="discount-banner">
-            <h3>🎉 Скидки и акции</h3>
-            <p>Скоро здесь появятся персональные предложения для вас</p>
+        <div class="home-links">
+            <button onclick="showFeature('Скидки')">Скидки</button>
+            <button onclick="showFeature('Акции')">Акции</button>
+            <button onclick="showFeature('Промокод')">Промокод</button>
         </div>
 
         <div class="section-heading">
-            <h3>🔥 Популярное</h3>
-            <span class="see-all" onclick="navigateTo('pageMenu')">Всё меню →</span>
+            <h3>Популярные блюда сегодня</h3>
         </div>
         <div id="popularList"></div>
-
-        <div class="quick-tiles">
-            <div class="card quick-tile" onclick="navigateTo('pageMenu')">
-                <div class="qt-icon">🍽️</div>
-                <div class="qt-label">Меню</div>
-            </div>
-            <div class="card quick-tile" onclick="navigateTo('pageCart')">
-                <div class="qt-icon">🛒</div>
-                <div class="qt-label">Корзина</div>
-            </div>
-        </div>
     </div>
 
     <!-- МЕНЮ -->
     <div id="pageMenu" class="page">
-        <h2 class="page-title font-serif">🍽️ Меню</h2>
+        <div class="menu-header">
+            <div>
+                <div class="eyebrow">Меню</div>
+                <h2 class="menu-title">Выберите блюдо</h2>
+            </div>
+        </div>
 
         <div class="search-box-wrap">
-            <span class="si">🔍</span>
+            <span class="si" aria-hidden="true"></span>
             <input type="text" class="search-box" id="searchInput" placeholder="Поиск блюда или ингредиента..." oninput="filterMenu()" />
         </div>
 
-        <div class="category-tabs" id="categoryTabs"></div>
+        <div class="category-select-wrap">
+            <label>Категории</label>
+            <div class="category-dropdown" id="categoryDropdown">
+                <button type="button" class="category-trigger" id="categoryTrigger" onclick="toggleCategoryDropdown()">Горячие блюда</button>
+                <div class="category-menu" id="categoryMenu"></div>
+            </div>
+        </div>
 
         <div id="menuList"></div>
     </div>
 
     <!-- КОРЗИНА -->
     <div id="pageCart" class="page">
-        <h2 class="page-title font-serif">🛒 Корзина</h2>
+        <div class="eyebrow">Корзина</div><h2 class="menu-title">Ваш заказ</h2>
         <div id="cartList"></div>
     </div>
 
     <!-- ПРОФИЛЬ -->
     <div id="pageProfile" class="page">
-        <h2 class="page-title font-serif">👤 Профиль</h2>
-        <div class="card" id="profileInfo"></div>
+                <div class="card" id="profileInfo"></div>
         <div style="margin-top:18px;">
-            <div class="section-heading"><h3>📋 История заказов</h3></div>
+            <div class="section-heading"><h3>История заказов</h3></div>
             <div class="card" id="orderHistory"></div>
         </div>
     </div>
@@ -818,18 +964,28 @@
     <!-- НАВИГАЦИЯ -->
     <div class="bottom-nav">
         <button class="active" data-page="pageHome" onclick="navigateTo('pageHome')">
-            <span class="icon">🏠</span> Главная
+            <span class="nav-label">Главная</span>
         </button>
         <button data-page="pageMenu" onclick="navigateTo('pageMenu')">
-            <span class="icon">🍽️</span> Меню
+            <span class="nav-label">Меню</span>
         </button>
         <button data-page="pageCart" onclick="navigateTo('pageCart')" style="position:relative;">
-            <span class="icon">🛒</span> Корзина
+            <span class="nav-label">Корзина</span>
             <span class="badge" id="cartBadge" style="display:none;">0</span>
         </button>
         <button data-page="pageProfile" onclick="navigateTo('pageProfile')">
-            <span class="icon">👤</span> Профиль
+            <span class="nav-label">Профиль</span>
         </button>
+    </div>
+</div>
+
+<!-- ИНФОРМАЦИОННОЕ ОКНО -->
+<div class="feature-modal" id="featureModal" onclick="if(event.target===this) closeFeature()">
+    <div class="feature-modal-box">
+        <div class="feature-modal-kicker">Terassa</div>
+        <h3 class="feature-modal-title" id="featureModalTitle">Скидки</h3>
+        <p class="feature-modal-text" id="featureModalText">Скоро здесь появятся скидки.</p>
+        <button class="feature-modal-close" onclick="closeFeature()">Закрыть</button>
     </div>
 </div>
 
@@ -838,7 +994,7 @@
     <div class="modal-box">
         <div class="modal-handle"></div>
         <h3 id="modalDishName">Название</h3>
-        <p style="color:var(--muted);font-size:13px;">Состав блюда:</p>
+        <p style="color:var(--muted);font-size:13px;">Состав</p>
         <div class="ingredients-tags" id="modalIngredientsList"></div>
         <button class="close-btn" onclick="closeModal()">Закрыть</button>
     </div>
@@ -850,133 +1006,110 @@
     // ============================================================
 
     const MENU = [
-        { id: 1, name: 'Тартар из тунца с авокадо', price: 160000, category: 'Салаты', ingredients: ['тунец', 'авокадо', 'красный лук', 'оливковое масло', 'специи'], popular: true },
-        { id: 2, name: 'Цезарь с креветками', price: 150000, category: 'Салаты', ingredients: ['листья салата', 'креветки', 'томаты черри', 'перепелиные яйца', 'хрустящие сухарики', 'соус Цезарь'], popular: true },
-        { id: 3, name: 'Цезарь с курицей', price: 130000, category: 'Салаты', ingredients: ['листья салата', 'куриное филе', 'томаты черри', 'перепелиные яйца', 'хрустящие сухарики', 'соус Цезарь'], popular: false },
-        { id: 4, name: 'Тайский салат с креветками', price: 150000, category: 'Салаты', ingredients: ['креветки', 'авокадо', 'манго', 'огурец', 'болгарский перец', 'кинза', 'кунжут', 'специи'], popular: false },
-        { id: 5, name: 'Тёплый салат с хрустящим баклажаном', price: 120000, category: 'Салаты', ingredients: ['хрустящий баклажан', 'болгарский перец', 'крем-чиз', 'кинза', 'кунжут', 'специи'], popular: false },
-        { id: 6, name: 'Овощная ассорти', price: 70000, category: 'Холодные закуски', ingredients: ['овощи сезонные'], popular: false },
-        { id: 7, name: 'Сырная тарелка (гауда, пармезан, дорблю)', price: 190000, category: 'Холодные закуски', ingredients: ['гауда', 'пармезан', 'дорблю'], popular: false },
-        { id: 8, name: 'Сало с горчицей и хлебом', price: 80000, category: 'Холодные закуски', ingredients: ['сало', 'горчица', 'хлеб'], popular: false },
-        { id: 9, name: 'Закуска под рюмочку', price: 80000, category: 'Холодные закуски', ingredients: ['огурцы маринованные', 'домашнее сало', 'маринованные грибы'], popular: false },
-        { id: 10, name: 'Жульен с грибами', price: 80000, category: 'Горячие блюда', ingredients: ['грибной жульен', 'соус бешамель', 'сыр моцарелла', 'пармезан', 'мускатный орех'], popular: false },
-        { id: 11, name: 'Жульен с курицей', price: 90000, category: 'Горячие блюда', ingredients: ['жульен с курицей', 'соус бешамель', 'сыр моцарелла', 'пармезан', 'мускатный орех'], popular: false },
-        { id: 12, name: 'Жульен с креветкой', price: 100000, category: 'Горячие блюда', ingredients: ['жульен с креветкой', 'соус бешамель', 'сыр моцарелла', 'пармезан', 'мускатный орех'], popular: false },
-        { id: 13, name: 'Лосось на гриле', price: 150000, category: 'Горячие блюда', ingredients: ['стейк лосося', 'спаржа', 'брокколи', 'помидоры черри', 'соус тартар', 'специи'], popular: true },
-        { id: 14, name: 'Стейк из тунца', price: 150000, category: 'Горячие блюда', ingredients: ['стейк тунца', 'спаржа', 'брокколи', 'помидоры черри', 'соус тартар', 'специи'], popular: false },
-        { id: 15, name: 'Курица по-французски', price: 150000, category: 'Горячие блюда', ingredients: ['филе бедра', 'помидор', 'картофельный гратен', 'соус бешамель', 'сыр'], popular: false },
-        { id: 16, name: 'Свинина по-французски', price: 160000, category: 'Горячие блюда', ingredients: ['отбивная свинина', 'картофельный гратен', 'помидор', 'соус бешамель', 'сыр'], popular: false },
-        { id: 17, name: 'Отварной картофель с малосольной селедочкой', price: 180000, category: 'Горячие блюда', ingredients: ['картофель', 'сельдь', 'маринованный лук'], popular: false },
-        { id: 18, name: 'Жареный гребешок с креветкой под азиатским соусом', price: 250000, category: 'Горячие блюда', ingredients: ['морской гребешок', 'креветки', 'азиатский соус'], popular: true },
-        { id: 19, name: 'Свиные рёбра в медово-горчичном соусе', price: 250000, category: 'Свиные рёбра', ingredients: ['свиные рёбра', 'медово-горчичный соус', 'кетчуп', 'кисло-сладкий соус'], popular: true },
-        { id: 20, name: 'Свиные рёбра в соусе Терияки', price: 250000, category: 'Свиные рёбра', ingredients: ['свиные рёбра', 'соус терияки', 'картофель по-деревенски', 'кунжут'], popular: false },
-        { id: 21, name: 'Свиные рёбра в соусе Барбекю', price: 250000, category: 'Свиные рёбра', ingredients: ['свиные рёбра', 'соус барбекю', 'картофель по-деревенски'], popular: false },
-        { id: 22, name: 'Говяжьи рёбра в медово-горчичном соусе', price: 700000, category: 'Говяжьи рёбра', ingredients: ['говяжьи рёбра', 'медово-горчичный соус', 'картофель по-деревенски', 'кетчуп'], popular: true },
-        { id: 23, name: 'Говяжьи рёбра в соусе Терияки', price: 700000, category: 'Говяжьи рёбра', ingredients: ['говяжьи рёбра', 'соус терияки', 'картофель по-деревенски', 'кунжут'], popular: false },
-        { id: 24, name: 'Говяжьи рёбра в соусе Барбекю', price: 700000, category: 'Говяжьи рёбра', ingredients: ['говяжьи рёбра', 'соус барбекю', 'картофель по-деревенски'], popular: false },
-        { id: 25, name: 'Картофель по-деревенски', price: 80000, category: 'Гарниры', ingredients: ['румяные картофельные дольки', 'специи'], popular: false },
-        { id: 26, name: 'Картофель фри', price: 70000, category: 'Гарниры', ingredients: ['хрустящий картофель фри'], popular: false },
-        { id: 27, name: 'Нежное гороховое пюре', price: 80000, category: 'Гарниры', ingredients: ['домашнее гороховое пюре', 'кремовая текстура'], popular: false },
-        { id: 28, name: 'Домашние пельмени с говядиной', price: 120000, category: 'Пельмени и вареники', ingredients: ['говядина', 'тесто'], popular: false },
-        { id: 29, name: 'Домашние пельмени со свининой', price: 110000, category: 'Пельмени и вареники', ingredients: ['свинина', 'тесто'], popular: false },
-        { id: 30, name: 'Домашние пельмени с курицей', price: 100000, category: 'Пельмени и вареники', ingredients: ['курица', 'тесто'], popular: false },
-        { id: 31, name: 'Домашние вареники с картофелем', price: 100000, category: 'Пельмени и вареники', ingredients: ['картофель', 'тесто'], popular: false },
-        { id: 32, name: 'Вареники с лососем, креветкой и сливочным сыром', price: 130000, category: 'Пельмени и вареники', ingredients: ['лосось', 'креветка', 'сливочный сыр', 'тесто'], popular: true },
-        { id: 33, name: 'Копчёная перепёлка (2 шт.)', price: 120000, category: 'Закуски к пиву', ingredients: ['копчёная перепёлка'], popular: false },
-        { id: 34, name: 'Джерки из говядины', price: 120000, category: 'Закуски к пиву', ingredients: ['вяленая говядина'], popular: false },
-        { id: 35, name: 'Джерки из курицы', price: 100000, category: 'Закуски к пиву', ingredients: ['вяленая курица'], popular: false },
-        { id: 36, name: 'Джерки из свинины', price: 110000, category: 'Закуски к пиву', ingredients: ['вяленая свинина'], popular: false },
-        { id: 37, name: 'Скумбрия холодного копчения', price: 180000, category: 'Закуски к пиву', ingredients: ['скумбрия холодного копчения'], popular: false },
-        { id: 38, name: 'Филе сибаса холодного копчения (50 г)', price: 120000, category: 'Закуски к пиву', ingredients: ['филе сибаса холодного копчения'], popular: false },
-        { id: 39, name: 'Мойва холодного копчения', price: 120000, category: 'Закуски к пиву', ingredients: ['мойва холодного копчения'], popular: false },
-        { id: 40, name: 'Наполеон', price: 70000, category: 'Десерты', ingredients: ['слоёные коржи', 'заварной крем'], popular: true },
-        { id: 41, name: 'Медовик', price: 70000, category: 'Десерты', ingredients: ['медовые коржи', 'сметанный крем'], popular: false },
-        { id: 42, name: 'Классический чизкейк', price: 70000, category: 'Десерты', ingredients: ['сливочный чизкейк', 'песочная основа'], popular: false },
-        { id: 43, name: 'Водка Абсолют 40 гр.', price: 60000, category: 'Водка', ingredients: ['водка Абсолют'], popular: false },
-        { id: 44, name: 'Водка Абсолют 100 гр.', price: 130000, category: 'Водка', ingredients: ['водка Абсолют'], popular: false },
-        { id: 45, name: 'Водка Смирнов 40 гр.', price: 50000, category: 'Водка', ingredients: ['водка Смирнов'], popular: false },
-        { id: 46, name: 'Водка Смирнов 100 гр.', price: 100000, category: 'Водка', ingredients: ['водка Смирнов'], popular: false },
-        { id: 47, name: 'Ром Бакарди 50 гр.', price: 80000, category: 'Ром', ingredients: ['ром Бакарди'], popular: false },
-        { id: 48, name: 'Ром Бакарди 100 гр.', price: 150000, category: 'Ром', ingredients: ['ром Бакарди'], popular: false },
-        { id: 49, name: 'Виски Балантайс 50 гр.', price: 80000, category: 'Виски', ingredients: ['виски Балантайс'], popular: false },
-        { id: 50, name: 'Виски Балантайс 100 гр.', price: 150000, category: 'Виски', ingredients: ['виски Балантайс'], popular: false },
-        { id: 51, name: 'Джек Дэниелс 50 гр.', price: 80000, category: 'Виски', ingredients: ['виски Джек Дэниелс'], popular: false },
-        { id: 52, name: 'Коньяк Лизгинка 100 гр.', price: 160000, category: 'Виски', ingredients: ['коньяк Лизгинка'], popular: false },
-        { id: 53, name: 'Коньяк Лизгинка 40 гр.', price: 80000, category: 'Виски', ingredients: ['коньяк Лизгинка'], popular: false },
-        { id: 54, name: 'Джин Лондон 50 гр.', price: 80000, category: 'Виски', ingredients: ['джин Лондон'], popular: false },
-        { id: 55, name: 'Ликер Егермейстер 50 гр.', price: 90000, category: 'Виски', ingredients: ['ликер Егермейстер'], popular: false },
-        { id: 56, name: 'Мартини 50 гр.', price: 80000, category: 'Виски', ingredients: ['мартини'], popular: false },
-        { id: 57, name: 'Вино красное сухое (Чили) 150 гр.', price: 120000, category: 'Вино', ingredients: ['вино красное сухое Чили'], popular: false },
-        { id: 58, name: 'Вино белое сухое (Чили) 150 гр.', price: 120000, category: 'Вино', ingredients: ['вино белое сухое Чили'], popular: false },
-        { id: 59, name: 'Вино красное сухое 750 гр (Чили)', price: 400000, category: 'Вино', ingredients: ['вино красное сухое Чили'], popular: false },
-        { id: 60, name: 'Вино белое сухое 750 гр (Чили)', price: 400000, category: 'Вино', ingredients: ['вино белое сухое Чили'], popular: false },
-        { id: 61, name: 'Aperol Spritz', price: 140000, category: 'Коктейли', ingredients: ['Aperol', 'просекко', 'содовая'], popular: true },
-        { id: 62, name: 'Gin Tonik', price: 140000, category: 'Коктейли', ingredients: ['джин', 'тоник'], popular: false },
-        { id: 63, name: 'Cuba Libre', price: 140000, category: 'Коктейли', ingredients: ['ром', 'кола', 'лайм'], popular: false },
-        { id: 64, name: 'Mojito', price: 140000, category: 'Коктейли', ingredients: ['ром', 'мята', 'лайм', 'сахар', 'содовая'], popular: true },
-        { id: 65, name: 'Pina Colada', price: 140000, category: 'Коктейли', ingredients: ['ром', 'кокосовое молоко', 'ананас'], popular: false },
-        { id: 66, name: 'Margarita', price: 140000, category: 'Коктейли', ingredients: ['текила', 'трипл сек', 'лайм'], popular: false },
-        { id: 67, name: 'Negroni', price: 140000, category: 'Коктейли', ingredients: ['джин', 'кампари', 'красный вермут'], popular: false },
-        { id: 68, name: 'Daiquiri', price: 140000, category: 'Коктейли', ingredients: ['ром', 'лайм', 'сахар'], popular: false },
-        { id: 69, name: 'Long island', price: 140000, category: 'Коктейли', ingredients: ['водка', 'джин', 'ром', 'текила', 'трипл сек', 'кола'], popular: false },
-        { id: 70, name: 'Midori Sour', price: 140000, category: 'Коктейли', ingredients: ['Midori', 'виски', 'лимон'], popular: false },
-        { id: 71, name: 'Rose Cola', price: 140000, category: 'Коктейли', ingredients: ['розовый ликер', 'кола'], popular: false },
-        { id: 72, name: 'Whiskey Sour', price: 140000, category: 'Коктейли', ingredients: ['виски', 'лимон', 'сахар'], popular: false },
-        { id: 73, name: 'Rum Sour', price: 140000, category: 'Коктейли', ingredients: ['ром', 'лимон', 'сахар'], popular: false },
-        { id: 74, name: 'Tequila Sour', price: 140000, category: 'Коктейли', ingredients: ['текила', 'лимон', 'сахар'], popular: false },
-        { id: 75, name: 'Basil Smash', price: 140000, category: 'Коктейли', ingredients: ['джин', 'базилик', 'лимон', 'сахар'], popular: false },
-        { id: 76, name: 'Blue Laguna', price: 140000, category: 'Коктейли', ingredients: ['водка', 'блю кюрасао', 'содовая'], popular: false },
-        { id: 77, name: 'Pina Colada (безалкогольный)', price: 80000, category: 'Безалкогольные коктейли', ingredients: ['кокосовое молоко', 'ананас', 'сливки'], popular: false },
-        { id: 78, name: 'Mojito (безалкогольный)', price: 80000, category: 'Безалкогольные коктейли', ingredients: ['мята', 'лайм', 'сахар', 'содовая'], popular: false },
-        { id: 79, name: 'Coca Cola', price: 25000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 80, name: 'Fanta', price: 25000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 81, name: 'Sprite', price: 25000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 82, name: 'Schweppes (серый)', price: 25000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 83, name: 'Schweppes (жёлтый)', price: 25000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 84, name: 'Schweppes (красный)', price: 25000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 85, name: 'Чай в бутылках холодный', price: 25000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 86, name: 'Вода содовая газ', price: 25000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 87, name: 'Вода без газа', price: 15000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 88, name: 'Минеральная вода Боржоми', price: 85000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 89, name: 'Домашний компот Ананасовый 300 мл', price: 20000, category: 'Напитки', ingredients: ['ананас'], popular: false },
-        { id: 90, name: 'Домашний компот Яблочный 300 мл', price: 20000, category: 'Напитки', ingredients: ['яблоко'], popular: false },
-        { id: 91, name: 'Сок Томатный 200 мл', price: 30000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 92, name: 'Сок Апельсиновый 200 мл', price: 30000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 93, name: 'Сок Вишнёвый 200 мл', price: 30000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 94, name: 'Сок Ананасовый 200 мл', price: 30000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 95, name: 'Сок Яблочный 200 мл', price: 30000, category: 'Напитки', ingredients: [], popular: false },
-        { id: 96, name: 'Эспрессо', price: 40000, category: 'Кофе и чай', ingredients: ['кофе'], popular: false },
-        { id: 97, name: 'Капучино', price: 45000, category: 'Кофе и чай', ingredients: ['кофе', 'молоко'], popular: false },
-        { id: 98, name: 'Латте', price: 50000, category: 'Кофе и чай', ingredients: ['кофе', 'молоко'], popular: false },
-        { id: 99, name: 'Чайник черного чая 350 гр', price: 50000, category: 'Кофе и чай', ingredients: ['чёрный чай'], popular: false },
-        { id: 100, name: 'Чайник черного чая 350 гр с фруктами', price: 70000, category: 'Кофе и чай', ingredients: ['чёрный чай', 'фрукты'], popular: false },
-        { id: 101, name: 'Чайник черного чая 600 гр', price: 65000, category: 'Кофе и чай', ingredients: ['чёрный чай'], popular: false },
-        { id: 102, name: 'Чайник черного чая 600 гр с фруктами', price: 90000, category: 'Кофе и чай', ingredients: ['чёрный чай', 'фрукты'], popular: false },
-        { id: 103, name: 'Чайник зеленого чая 350 гр', price: 50000, category: 'Кофе и чай', ingredients: ['зелёный чай'], popular: false },
-        { id: 104, name: 'Чайник зеленого чая 600 гр', price: 65000, category: 'Кофе и чай', ingredients: ['зелёный чай'], popular: false },
+        { id: 1, name: 'Тартар из тунца с авокадо', price: 160000, category: 'Салаты', ingredients: 'тунец, авокадо, красный лук, оливковое масло, специи.', popular: true },
+        { id: 2, name: 'Цезарь с креветками', price: 150000, category: 'Салаты', ingredients: 'листья салата, креветки, томаты черри, перепелиные яйца, хрустящие сухарики, фирменный соус «Цезарь».', popular: true },
+        { id: 3, name: 'Цезарь с курицей', price: 130000, category: 'Салаты', ingredients: 'листья салата, куриное филе, томаты черри, перепелиные яйца, хрустящие сухарики, фирменный соус «Цезарь».', popular: false },
+        { id: 4, name: 'Тайский салат с креветками', price: 150000, category: 'Салаты', ingredients: 'креветки, авокадо, манго, огурец, болгарский перец, кинза, кунжут, специи.', popular: false },
+        { id: 5, name: 'Тёплый салат с хрустящим баклажаном', price: 120000, category: 'Салаты', ingredients: 'хрустящий баклажан, болгарский перец, крем-чиз, кинза, кунжут, специи.', popular: false },
+        { id: 6, name: 'Овощная ассорти', price: 70000, category: 'Холодные закуски', ingredients: '', popular: false },
+        { id: 7, name: 'Сырная тарелка (гауда, пармезан, дорблю)', price: 190000, category: 'Холодные закуски', ingredients: '', popular: false },
+        { id: 8, name: 'Сало с горчицей и хлебом', price: 80000, category: 'Холодные закуски', ingredients: '', popular: false },
+        { id: 9, name: 'Закуска под рюмочку', price: 80000, category: 'Холодные закуски', ingredients: 'огурцы маринованные, домашнее сало, маринованные грибы.', popular: false },
+        { id: 10, name: 'Жульен с грибами', price: 80000, category: 'Горячие блюда', ingredients: 'грибной жульен в соусе бешамель, сыр моцарелла, пармезан, мускатный орех.', popular: false },
+        { id: 11, name: 'Жульен с курицей', price: 90000, category: 'Горячие блюда', ingredients: 'жульен с курицей в соусе бешамель, сыр моцарелла, пармезан, мускатный орех.', popular: false },
+        { id: 12, name: 'Жульен с креветкой', price: 100000, category: 'Горячие блюда', ingredients: 'жульен с креветкой в соусе бешамель, сыр моцарелла, пармезан, мускатный орех.', popular: false },
+        { id: 13, name: 'Лосось на гриле', price: 150000, category: 'Горячие блюда', ingredients: 'стейк лосося, спаржа, брокколи, помидоры черри, соус тартар, специи.', popular: true },
+        { id: 14, name: 'Стейк из тунца', price: 150000, category: 'Горячие блюда', ingredients: 'стейк тунца, спаржа, брокколи, помидоры черри, соус тартар, специи.', popular: false },
+        { id: 15, name: 'Курица по-французски', price: 150000, category: 'Горячие блюда', ingredients: 'филе бедра, помидор, картофельный гратен, соус бешамель, запеченное под сырной шапочкой.', popular: false },
+        { id: 16, name: 'Свинина по-французски', price: 160000, category: 'Горячие блюда', ingredients: 'отбивная свинина на картофельном гратене, помидор, соус бешамель, запеченная под сырной шапочкой.', popular: false },
+        { id: 17, name: 'Отварной картофель с малосольной селедочкой', price: 180000, category: 'Горячие блюда', ingredients: 'картофель, сельдь, маринованный лук.', popular: false },
+        { id: 18, name: 'Жареный гребешок с креветкой под азиатским соусом', price: 250000, category: 'Горячие блюда', ingredients: 'морской гребешок и сочные креветки, обжаренные до золотистой корочки, с ароматным азиатским соусом.', popular: true },
+        { id: 19, name: 'Свиные рёбра в медово-горчичном соусе', price: 250000, category: 'Свиные рёбра', ingredients: 'свиные рёбра, томленные в медово-горчичном соусе 6 часов, соус кетчуп, кисло-сладкий.', popular: true },
+        { id: 20, name: 'Свиные рёбра в соусе Терияки', price: 250000, category: 'Свиные рёбра', ingredients: 'свиные рёбра, томленные в соусе Терияки 6 часов, картофель по-деревенски, кунжут.', popular: false },
+        { id: 21, name: 'Свиные рёбра в соусе Барбекю', price: 250000, category: 'Свиные рёбра', ingredients: 'свиные рёбра, томленные в соусе барбекю 6 часов, картофель по-деревенски.', popular: false },
+        { id: 22, name: 'Говяжьи рёбра в медово-горчичном соусе', price: 700000, category: 'Говяжьи рёбра', ingredients: 'говяжьи рёбра, томленные в медово-горчичном соусе 8 часов, картофель по-деревенски, соус кетчуп и кисло-сладкий.', popular: true },
+        { id: 23, name: 'Говяжьи рёбра в соусе Терияки', price: 700000, category: 'Говяжьи рёбра', ingredients: 'говяжьи рёбра, томленные в соусе Терияки 8 часов, картофель по-деревенски, соус кетчуп и кисло-сладкий, кунжут.', popular: false },
+        { id: 24, name: 'Говяжьи рёбра в соусе Барбекю', price: 700000, category: 'Говяжьи рёбра', ingredients: 'говяжьи рёбра, томленные в соусе барбекю 8 часов, картофель по-деревенски.', popular: false },
+        { id: 25, name: 'Картофель по-деревенски', price: 80000, category: 'Гарниры', ingredients: 'Румяные картофельные дольки со специями.', popular: false },
+        { id: 26, name: 'Картофель фри', price: 70000, category: 'Гарниры', ingredients: 'Хрустящий картофель фри.', popular: false },
+        { id: 27, name: 'Нежное гороховое пюре', price: 80000, category: 'Гарниры', ingredients: 'Домашнее гороховое пюре с кремовой текстурой.', popular: false },
+        { id: 28, name: 'Домашние пельмени с говядиной', price: 120000, category: 'Пельмени и вареники', ingredients: '', popular: false },
+        { id: 29, name: 'Домашние пельмени со свининой', price: 110000, category: 'Пельмени и вареники', ingredients: '', popular: false },
+        { id: 30, name: 'Домашние пельмени с курицей', price: 100000, category: 'Пельмени и вареники', ingredients: '', popular: false },
+        { id: 31, name: 'Домашние вареники с картофелем', price: 100000, category: 'Пельмени и вареники', ingredients: '', popular: false },
+        { id: 32, name: 'Вареники с лососем, креветкой и сливочным сыром', price: 130000, category: 'Пельмени и вареники', ingredients: '', popular: true },
+        { id: 33, name: 'Копчёная перепёлка (2 шт.)', price: 120000, category: 'Закуски к пиву', ingredients: '', popular: false },
+        { id: 34, name: 'Джерки из говядины', price: 120000, category: 'Закуски к пиву', ingredients: '', popular: false },
+        { id: 35, name: 'Джерки из курицы', price: 100000, category: 'Закуски к пиву', ingredients: '', popular: false },
+        { id: 36, name: 'Джерки из свинины', price: 110000, category: 'Закуски к пиву', ingredients: '', popular: false },
+        { id: 37, name: 'Скумбрия холодного копчения', price: 180000, category: 'Закуски к пиву', ingredients: '', popular: false },
+        { id: 38, name: 'Филе сибаса холодного копчения (50 г)', price: 120000, category: 'Закуски к пиву', ingredients: '', popular: false },
+        { id: 39, name: 'Мойва холодного копчения', price: 120000, category: 'Закуски к пиву', ingredients: '', popular: false },
+        { id: 40, name: 'Наполеон', price: 70000, category: 'Десерты', ingredients: 'Нежные слоёные коржи с заварным кремом.', popular: true },
+        { id: 41, name: 'Медовик', price: 70000, category: 'Десерты', ingredients: 'Медовые коржи с нежным сметанным кремом.', popular: false },
+        { id: 42, name: 'Классический чизкейк', price: 70000, category: 'Десерты', ingredients: 'Нежный сливочный чизкейк на песочной основе.', popular: false },
+        { id: 43, name: 'Водка Абсолют 40 гр.', price: 60000, category: 'Водка', ingredients: '', popular: false },
+        { id: 44, name: 'Водка Абсолют 100 гр.', price: 130000, category: 'Водка', ingredients: '', popular: false },
+        { id: 45, name: 'Водка Смирнов 40 гр.', price: 50000, category: 'Водка', ingredients: '', popular: false },
+        { id: 46, name: 'Водка Смирнов 100 гр.', price: 100000, category: 'Водка', ingredients: '', popular: false },
+        { id: 47, name: 'Ром Бакарди 50 гр.', price: 80000, category: 'Ром', ingredients: '', popular: false },
+        { id: 48, name: 'Ром Бакарди 100 гр.', price: 150000, category: 'Ром', ingredients: '', popular: false },
+        { id: 49, name: 'Виски Балантайс 50 гр.', price: 80000, category: 'Виски', ingredients: '', popular: false },
+        { id: 50, name: 'Виски Балантайс 100 гр.', price: 150000, category: 'Виски', ingredients: '', popular: false },
+        { id: 51, name: 'Джек Дэниелс 50 гр.', price: 80000, category: 'Виски', ingredients: '', popular: false },
+        { id: 52, name: 'Коньяк Лизгинка 100 гр.', price: 160000, category: 'Виски', ingredients: '', popular: false },
+        { id: 53, name: 'Коньяк Лизгинка 40 гр.', price: 80000, category: 'Виски', ingredients: '', popular: false },
+        { id: 54, name: 'Джин Лондон 50 гр.', price: 80000, category: 'Виски', ingredients: '', popular: false },
+        { id: 55, name: 'Ликер Егермейстер 50 гр.', price: 90000, category: 'Виски', ingredients: '', popular: false },
+        { id: 56, name: 'Мартини 50 гр.', price: 80000, category: 'Виски', ingredients: '', popular: false },
+        { id: 57, name: 'Вино красное сухое (Чили) 150 гр.', price: 120000, category: 'Вино', ingredients: '', popular: false },
+        { id: 58, name: 'Вино белое сухое (Чили) 150 гр.', price: 120000, category: 'Вино', ingredients: '', popular: false },
+        { id: 59, name: 'Вино красное сухое 750 гр (Чили)', price: 400000, category: 'Вино', ingredients: '', popular: false },
+        { id: 60, name: 'Вино белое сухое 750 гр (Чили)', price: 400000, category: 'Вино', ingredients: '', popular: false },
+        { id: 61, name: 'Aperol Spritz (Апероль Шприц)', price: 140000, category: 'Коктейли', ingredients: '', popular: true },
+        { id: 62, name: 'Gin Tonik (Джин Тоник)', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 63, name: 'Cuba Libre (Куба Либре)', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 64, name: 'Mojito (Мохито)', price: 140000, category: 'Коктейли', ingredients: '', popular: true },
+        { id: 65, name: 'Pina Colada (Пина Колада)', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 66, name: 'Margarita (Маргарита)', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 67, name: 'Negroni (Негрони)', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 68, name: 'Daiquiri (Дайкири)', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 69, name: 'Long island (Лонг Айленд)', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 70, name: 'Midori Sour', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 71, name: 'Rose Cola', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 72, name: 'Whiskey Sour', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 73, name: 'Rum Sour', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 74, name: 'Tequila Sour', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 75, name: 'Basil Smash', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 76, name: 'Blue Laguna (Блю Лагуна)', price: 140000, category: 'Коктейли', ingredients: '', popular: false },
+        { id: 77, name: 'Pina Colada (Пина Колада)', price: 80000, category: 'Безалкогольные коктейли', ingredients: '', popular: false },
+        { id: 78, name: 'Mojito (Мохито)', price: 80000, category: 'Безалкогольные коктейли', ingredients: '', popular: false },
+        { id: 79, name: 'Coca Cola, Fanta, Sprait', price: 25000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 80, name: 'Schweppes (серый, желтый, красный)', price: 25000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 81, name: 'Чай в бутылках холодный', price: 25000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 82, name: 'Вода содовая газ', price: 25000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 83, name: 'Вода без газа', price: 15000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 84, name: 'Минеральная вода Боржоми', price: 85000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 85, name: 'Домашний компот Ананасовый 300 мл', price: 20000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 86, name: 'Домашний компот Яблочный 300 мл', price: 20000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 87, name: 'Сок Томатный 200 мл', price: 30000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 88, name: 'Сок Апельсиновый 200 мл', price: 30000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 89, name: 'Сок Вишнёвый 200 мл', price: 30000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 90, name: 'Сок Ананасовый 200 мл', price: 30000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 91, name: 'Сок Яблочный 200 мл', price: 30000, category: 'Напитки', ingredients: '', popular: false },
+        { id: 92, name: 'Эспрессо', price: 40000, category: 'Кофе, чай', ingredients: '', popular: false },
+        { id: 93, name: 'Капучино', price: 45000, category: 'Кофе, чай', ingredients: '', popular: false },
+        { id: 94, name: 'Латте', price: 50000, category: 'Кофе, чай', ingredients: '', popular: false },
+        { id: 95, name: 'Чайник черного чая 350 гр', price: 50000, category: 'Кофе, чай', ingredients: '', popular: false },
+        { id: 96, name: 'Чайник черного чай 350 гр с фруктами', price: 70000, category: 'Кофе, чай', ingredients: '', popular: false },
+        { id: 97, name: 'Чайник черного чая 600 гр', price: 65000, category: 'Кофе, чай', ingredients: '', popular: false },
+        { id: 98, name: 'Чайник черного чая 600 гр с фруктами', price: 90000, category: 'Кофе, чай', ingredients: '', popular: false },
+        { id: 99, name: 'Чайник зеленого чая 350 гр', price: 50000, category: 'Кофе, чай', ingredients: '', popular: false },
+        { id: 100, name: 'Чайник зеленого чая 600 гр', price: 65000, category: 'Кофе, чай', ingredients: '', popular: false }
     ];
 
     // Иконки по категориям — чисто визуальное дополнение
-    const CATEGORY_ICONS = {
-        'Салаты': '🥗',
-        'Холодные закуски': '🧀',
-        'Горячие блюда': '🍲',
-        'Свиные рёбра': '🍖',
-        'Говяжьи рёбра': '🍖',
-        'Гарниры': '🍟',
-        'Пельмени и вареники': '🥟',
-        'Закуски к пиву': '🍺',
-        'Десерты': '🍰',
-        'Водка': '🥃',
-        'Ром': '🥃',
-        'Виски': '🥃',
-        'Вино': '🍷',
-        'Коктейли': '🍹',
-        'Безалкогольные коктейли': '🍹',
-        'Напитки': '🥤',
-        'Кофе и чай': '☕',
-    };
-    function dishIcon(dish) { return CATEGORY_ICONS[dish.category] || '🍽️'; }
+    
 
     // ============================================================
     // 2. СОСТОЯНИЕ
@@ -986,12 +1119,12 @@
 
     let cart = [];
     let user = null;
-    let currentCategory = 'Все';
+    let currentCategory = 'Горячие блюда';
     let searchQuery = '';
     let orderHistory = [];
     let stoppedItems = [];
 
-    const CATEGORIES = ['Все', ...new Set(MENU.map(d => d.category))];
+    const CATEGORIES = [...new Set(MENU.map(d => d.category))];
 
     // ============================================================
     // 3. АВТОРИЗАЦИЯ (МИНИ-АНКЕТА)
@@ -1087,17 +1220,59 @@
     // ============================================================
 
     function renderCategoryTabs() {
-        const container = document.getElementById('categoryTabs');
-        container.innerHTML = CATEGORIES.map(cat =>
-            `<button class="${cat === currentCategory ? 'active' : ''}" onclick="setCategory('${cat}')">${cat === 'Все' ? '✨ Все' : (CATEGORY_ICONS[cat] || '') + ' ' + cat}</button>`
+        const menu = document.getElementById('categoryMenu');
+        const trigger = document.getElementById('categoryTrigger');
+        if (!menu || !trigger) return;
+
+        menu.innerHTML = CATEGORIES.map(cat =>
+            `<button type="button" class="category-option ${cat === currentCategory ? 'active' : ''}" onclick="setCategory('${cat.replace(/'/g, "\\'")}')">${cat}</button>`
         ).join('');
+        trigger.textContent = currentCategory;
+    }
+
+    function toggleCategoryDropdown() {
+        const dropdown = document.getElementById('categoryDropdown');
+        if (!dropdown) return;
+        dropdown.classList.toggle('open');
+    }
+
+    function closeCategoryDropdown() {
+        const dropdown = document.getElementById('categoryDropdown');
+        if (dropdown) dropdown.classList.remove('open');
     }
 
     function setCategory(cat) {
         currentCategory = cat;
         renderCategoryTabs();
+        closeCategoryDropdown();
         renderMenu();
     }
+
+    function showFeature(type) {
+        const title = document.getElementById('featureModalTitle');
+        const text = document.getElementById('featureModalText');
+        if (!title || !text) return;
+        const messages = {
+            'Скидки': 'Скоро здесь появятся скидки.',
+            'Акции': 'Скоро здесь появятся акции.',
+            'Промокод': 'Скоро здесь появятся промокоды.'
+        };
+        title.textContent = type;
+        text.textContent = messages[type] || 'Скоро здесь появится информация.';
+        document.getElementById('featureModal').classList.add('open');
+    }
+
+    function closeFeature() {
+        document.getElementById('featureModal')?.classList.remove('open');
+    }
+
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('categoryDropdown');
+        if (dropdown && !dropdown.contains(e.target)) closeCategoryDropdown();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { closeCategoryDropdown(); closeFeature(); }
+    });
 
     function filterMenu() {
         searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -1154,29 +1329,29 @@
         return `
             <div class="dish-item ${isStopped ? 'stopped' : ''}">
                 <div class="dish-main">
-                    <div class="dish-icon">${dishIcon(dish)}</div>
                     <div class="dish-info">
-                        <h4>
-                            ${dish.name} ${dish.popular ? '🔥' : ''}
+                        <div class="dish-topline">
+                            <h4>${dish.name}</h4>
                             ${isStopped ? '<span class="stopped-badge">СТОП</span>' : ''}
-                        </h4>
+                        </div>
                         <div class="price">${formatPrice(dish.price)}</div>
                         ${dish.ingredients && dish.ingredients.length ? `
-                            <div class="show-ingredients" onclick="showIngredients(${dish.id})">Состав →</div>
+                            <button class="show-ingredients" onclick="showIngredients(${dish.id})">Состав</button>
                         ` : ''}
                         ${user?.isAdmin ? `
                             <div class="admin-dish-controls">
                                 ${isStopped ?
-                                    `<button class="unstop-btn" onclick="toggleStopList(${dish.id})">✅ Убрать из стоп-листа</button>` :
-                                    `<button class="stop-btn" onclick="toggleStopList(${dish.id})">⛔ В стоп-лист</button>`
+                                    `<button class="unstop-btn" onclick="toggleStopList(${dish.id})">Убрать из стоп-листа</button>` :
+                                    `<button class="stop-btn" onclick="toggleStopList(${dish.id})">В стоп-лист</button>`
                                 }
                             </div>
                         ` : ''}
                     </div>
                 </div>
                 <div class="dish-actions">
-                    ${qty > 0 ? `<span class="qty">${qty}</span>` : ''}
-                    <button onclick="addToCart(${dish.id})" ${isStopped ? 'disabled' : ''}>+</button>
+                    <button class="qty-btn minus" onclick="removeFromCart(${dish.id})" ${qty === 0 || isStopped ? 'disabled' : ''}>−</button>
+                    <span class="qty">${qty}</span>
+                    <button class="qty-btn plus" onclick="addToCart(${dish.id})" ${isStopped ? 'disabled' : ''}>+</button>
                 </div>
             </div>
         `;
@@ -1187,26 +1362,15 @@
         const filtered = getFilteredMenu();
 
         if (!filtered.length) {
-            container.innerHTML = '<div class="no-results"><div class="icon">😕</div><p>Ничего не найдено</p></div>';
+            container.innerHTML = '<div class="no-results"><div class="empty-mark"></div><p>Ничего не найдено</p></div>';
             return;
         }
 
-        // Если выбрана конкретная категория или есть поиск — просто список
-        if (currentCategory !== 'Все' || searchQuery) {
-            container.innerHTML = filtered.map(renderDishItem).join('');
-            return;
-        }
-
-        // На вкладке "Все" группируем по категориям для более понятной навигации
         let html = '';
-        let lastCat = null;
-        filtered.forEach(dish => {
-            if (dish.category !== lastCat) {
-                html += `<div class="menu-group-title">${CATEGORY_ICONS[dish.category] || ''} ${dish.category}</div>`;
-                lastCat = dish.category;
-            }
-            html += renderDishItem(dish);
-        });
+        if (currentCategory === 'Пельмени и вареники') {
+            html += '<div class="menu-note">Все пельмени подаются на выбор: в ароматном бульоне или без него. Подаются со сметаной.</div>';
+        }
+        html += filtered.map(renderDishItem).join('');
         container.innerHTML = html;
     }
 
@@ -1220,7 +1384,7 @@
 
     function addToCart(id) {
         if (stoppedItems.includes(id)) {
-            alert('⛔ Это блюдо временно недоступно (стоп-лист)');
+            alert('Это блюдо временно недоступно.');
             return;
         }
         
@@ -1280,7 +1444,7 @@
         const container = document.getElementById('cartList');
 
         if (cart.length === 0) {
-            container.innerHTML = '<div class="empty-state"><div class="icon">🛒</div><p>Корзина пуста</p><p style="font-size:12.5px;margin-top:4px;font-weight:400;color:var(--muted);">Загляните в меню, чтобы выбрать блюда</p></div>';
+            container.innerHTML = '<div class="empty-state"><div class="icon"></div><p>Корзина пуста</p><p style="font-size:12.5px;margin-top:4px;font-weight:400;color:var(--muted);">Загляните в меню, чтобы выбрать блюда</p></div>';
             return;
         }
 
@@ -1312,9 +1476,15 @@
                 </div>
 
                 <div class="delivery-options">
-                    <button id="deliveryPickup" class="active" onclick="setDelivery('pickup')">🏠 Заберу с собой</button>
-                    <button id="deliveryDelivery" onclick="setDelivery('delivery')">🚀 Доставка</button>
+                    <button id="deliveryPickup" class="active" onclick="setDelivery('pickup')">Заберу с собой</button>
+                    <button id="deliveryDelivery" onclick="setDelivery('delivery')">Доставка</button>
                 </div>
+                ${!user?.username ? `
+                    <div class="checkout-warning">
+                        <strong>Невозможно связаться в Telegram</strong>
+                        У вас не установлен username. После оформления заказа администратор не сможет написать вам напрямую. Установите username в настройках Telegram или сохраните номер заказа для связи вручную.
+                    </div>
+                ` : ''}
 
                 <button class="btn-primary" onclick="placeOrder()">Оформить заказ</button>
                 <div style="height:8px;"></div>
@@ -1347,20 +1517,6 @@
             alert('Пожалуйста, войдите в систему');
             return;
         }
-
-        // Проверка на username
-        if (!user.username) {
-            const confirmOrder = confirm(
-                '⚠️ У вас не установлен username в Telegram.\n\n' +
-                'Администратор не сможет связаться с вами.\n\n' +
-                'Вы можете:\n' +
-                '1. Установить username в Telegram (настройки)\n' +
-                '2. Отправить этот заказ вручную администратору из истории заказов\n\n' +
-                'Продолжить оформление?'
-            );
-            if (!confirmOrder) return;
-        }
-
         const orderData = {
             user_name: user.name,
             user_surname: user.surname,
@@ -1401,13 +1557,13 @@
 
                 if (!user.username) {
                     alert(
-                        '✅ Заказ отправлен!\n\n' +
-                        '⚠️ У вас нет username. Администратор не сможет написать вам.\n\n' +
+                        'Заказ отправлен!\n\n' +
+                        'У вас нет username. Администратор не сможет написать вам.\n\n' +
                         'Пожалуйста, отправьте номер заказа #' + order.id + ' администратору вручную.\n' +
                         'Или установите username в Telegram и сделайте новый заказ.'
                     );
                 } else {
-                    alert('✅ Заказ успешно отправлен! Администратор свяжется с вами.');
+                    alert('Заказ успешно отправлен! Администратор свяжется с вами.');
                 }
 
                 cart = [];
@@ -1418,10 +1574,10 @@
 
                 if (window.Telegram?.WebApp) window.Telegram.WebApp.close();
             } else {
-                alert('❌ Ошибка при отправке заказа: ' + (result.error || 'Неизвестная ошибка'));
+                alert('Ошибка при отправке заказа: ' + (result.error || 'Неизвестная ошибка'));
             }
         } catch (err) {
-            alert('❌ Ошибка соединения с сервером. Попробуйте позже.');
+            alert('Ошибка соединения с сервером. Попробуйте позже.');
             console.error(err);
         }
     }
@@ -1438,22 +1594,15 @@
 
         container.innerHTML = `
             <div class="profile-header">
-                <div class="profile-avatar">👨‍🍳</div>
+                <div class="profile-avatar">${(user.name || 'T').charAt(0).toUpperCase()}</div>
                 <h3 class="font-serif" style="font-size:21px;">${user.name} ${user.surname}</h3>
-                ${user.isAdmin ? '<p style="color:var(--gold);font-weight:700;font-size:12.5px;margin-top:4px;">👑 Администратор</p>' : ''}
-                ${user.username ? `<p style="color:var(--muted);font-size:13px;margin-top:4px;">@${user.username}</p>` : '<p style="color:var(--danger);font-size:12.5px;margin-top:4px;font-weight:600;">⚠️ Нет username</p>'}
+                ${user.isAdmin ? '<p style="color:var(--gold);font-weight:700;font-size:12.5px;margin-top:4px;">Администратор</p>' : ''}
+                ${user.username ? `<p style="color:var(--muted);font-size:13px;margin-top:4px;">@${user.username}</p>` : ''}
             </div>
             <div class="profile-row"><span class="label">Имя</span><span class="value">${user.name}</span></div>
             <div class="profile-row"><span class="label">Фамилия</span><span class="value">${user.surname}</span></div>
             <div class="profile-row"><span class="label">Дата рождения</span><span class="value">${birthDisplay}</span></div>
             <div class="profile-row"><span class="label">Пол</span><span class="value">${user.gender || 'Не указан'}</span></div>
-            ${user.birthDate ? `<div class="birthday-box">🎂 Скидка на день рождения активируется в ваш день</div>` : ''}
-            ${!user.username ? `
-                <div class="warning-box">
-                    <strong>⚠️ Внимание!</strong>
-                    У вас нет username в Telegram. Администратор не сможет связаться с вами. Установите username в настройках Telegram.
-                </div>
-            ` : ''}
         `;
 
         renderOrderHistory();
@@ -1463,16 +1612,16 @@
         const container = document.getElementById('orderHistory');
 
         if (!orderHistory.length) {
-            container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Заказов пока нет</p></div>';
+            container.innerHTML = '<div class="empty-state"><div class="empty-mark"></div><p>Заказов пока нет</p></div>';
             return;
         }
 
         const statusMap = {
-            'new': { label: '🆕 Новый', class: 'status-new' },
-            'cooking': { label: '👨‍🍳 Готовится', class: 'status-cooking' },
-            'ready': { label: '✅ Готов', class: 'status-ready' },
-            'completed': { label: '📦 Выдан', class: 'status-completed' },
-            'sent': { label: '📨 Отправлен', class: 'status-sent' }
+            'new': { label: 'Новый', class: 'status-new' },
+            'cooking': { label: 'Готовится', class: 'status-cooking' },
+            'ready': { label: 'Готов', class: 'status-ready' },
+            'completed': { label: 'Выдан', class: 'status-completed' },
+            'sent': { label: 'Отправлен', class: 'status-sent' }
         };
 
         let html = '';
@@ -1494,10 +1643,10 @@
                     </div>
                     ${user?.isAdmin && order.status !== 'sent' ? `
                         <button class="btn-success" style="margin-top:10px;width:100%;" onclick="updateOrderStatus(${order.id}, 'sent')">
-                            📨 Отметить: заказ отправлен
+                            Отметить: заказ отправлен
                         </button>
                     ` : ''}
-                    ${order.status === 'sent' ? '<div style="color:var(--success);font-size:12.5px;margin-top:6px;font-weight:600;">✅ Отправлен клиенту</div>' : ''}
+                    ${order.status === 'sent' ? '<div style="color:var(--success);font-size:12.5px;margin-top:6px;font-weight:600;">Отправлен клиенту</div>' : ''}
                 </div>
             `;
         });
@@ -1511,7 +1660,7 @@
             order.status = newStatus;
             saveOrdersToStorage();
             renderOrderHistory();
-            alert('✅ Статус заказа обновлён');
+            alert('Статус заказа обновлён');
         }
     }
 
@@ -1534,9 +1683,9 @@
 
     function showIngredients(id) {
         const dish = MENU.find(d => d.id === id);
-        if (!dish || !dish.ingredients || !dish.ingredients.length) return;
+        if (!dish || !dish.ingredients) return;
         document.getElementById('modalDishName').textContent = dish.name;
-        document.getElementById('modalIngredientsList').innerHTML = dish.ingredients.map(i => `<span class="ing-tag">${i}</span>`).join('');
+        document.getElementById('modalIngredientsList').innerHTML = `<div class="ingredient-text">${dish.ingredients}</div>`;
         document.getElementById('ingredientModal').classList.add('open');
     }
 
@@ -1554,17 +1703,16 @@
 
     function renderPopular() {
         const container = document.getElementById('popularList');
-        const popular = MENU.filter(d => d.popular).slice(0, 4);
-        container.innerHTML = '<div class="card" style="padding:4px 16px;">' + popular.map((d, i) => `
-            <div class="popular-card" onclick="navigateTo('pageMenu')" style="${i < popular.length - 1 ? 'border-bottom:1px solid var(--line);' : ''}">
-                <div class="pc-icon">${dishIcon(d)}</div>
-                <div style="flex:1;min-width:0;">
+        const popular = MENU.filter(d => d.popular).slice(0, 5);
+        container.innerHTML = popular.map(d => `
+            <button class="popular-card" onclick="setCategory('${d.category}'); navigateTo('pageMenu')">
+                <div class="popular-info">
                     <div class="pc-name">${d.name}</div>
                     <div class="pc-price">${formatPrice(d.price)}</div>
                 </div>
-                <div class="pc-arrow">→</div>
-            </div>
-        `).join('') + '</div>';
+                <span class="pc-arrow" aria-hidden="true">→</span>
+            </button>
+        `).join('');
     }
 
     // ============================================================
@@ -1609,8 +1757,8 @@
         } catch(e) {}
     }
 
-    console.log('🍷 Terassa Restaurant Mini App загружен!');
-    console.log('👑 Админ режим:', user?.isAdmin || false);
+    console.log('Terassa Restaurant Mini App загружен!');
+    console.log('Админ режим:', user?.isAdmin || false);
 </script>
 
 </body>
