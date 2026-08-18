@@ -42,7 +42,7 @@ def add_cors_headers(response):
 
 @app.route('/')
 def home():
-    return jsonify({'status': 'ok', 'message': 'Terassa Bot is running', 'version': '1.1.0'})
+    return jsonify({'status': 'ok', 'message': 'Terassa Bot is running', 'version': '1.2.0'})
 
 @app.route('/healthz')
 def health():
@@ -57,7 +57,7 @@ def send_welcome(message):
 
     reply_markup = ReplyKeyboardMarkup(
         resize_keyboard=True,
-        is_persistent=True  # кнопка всегда видна рядом с полем ввода
+        is_persistent=True
     )
     reply_markup.add(KeyboardButton(text="🍽 Открыть меню", web_app=WebAppInfo(url=web_app_url)))
 
@@ -88,8 +88,10 @@ def whoami(message):
         f"Твой ID: `{message.chat.id}`\n"
         f"Username: @{message.from_user.username}\n"
         f"ADMIN_CHAT_ID в конфиге: `{config.ADMIN_CHAT_ID}`\n"
-        f"Совпадает: {str(message.chat.id) == str(config.ADMIN_CHAT_ID)}"
+        f"Совпадает: {str(message.chat.id) == str(config.ADMIN_CHAT_ID)}",
+        parse_mode="Markdown"
     )
+
 
 # ============ КОМАНДЫ АДМИНИСТРАТОРА ============
 
@@ -236,6 +238,16 @@ def webhook():
                     'recommendations': recommendations
                 }), 409
 
+        # При оформлении заказа обновляем username пользователя в БД
+        telegram_id = str(data.get('telegram_id', '')).strip()
+        if telegram_id:
+            db.upsert_user(
+                telegram_id=telegram_id,
+                username=data.get('username') or None,
+                first_name=data.get('user_name'),
+                last_name=data.get('user_surname'),
+            )
+
         order_id = db.save_order(data)
 
         items_text = ""
@@ -313,6 +325,32 @@ def admin_check():
     return jsonify({'is_admin': is_admin_telegram_id(telegram_id), 'telegram_id': telegram_id})
 
 
+# ============ СИНХРОНИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ ============
+
+@app.route('/user/sync', methods=['POST', 'OPTIONS'])
+def user_sync():
+    if request.method == 'OPTIONS':
+        return ('', 204)
+    try:
+        data = request.json or {}
+        telegram_id = str(data.get('telegram_id', '')).strip()
+        if not telegram_id:
+            return jsonify({'error': 'telegram_id required'}), 400
+
+        db.upsert_user(
+            telegram_id=telegram_id,
+            username=data.get('username') or None,
+            first_name=data.get('first_name') or None,
+            last_name=data.get('last_name') or None,
+            birth_date=data.get('birth_date') or None,
+            gender=data.get('gender') or None
+        )
+        user = db.get_user(telegram_id)
+        return jsonify({'success': True, 'user': user})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/admin/stop-list', methods=['POST', 'OPTIONS'])
 def admin_stop_list():
     try:
@@ -378,11 +416,7 @@ def recommendations(dish_id):
 
 @app.route('/orders/by-telegram/<telegram_id>', methods=['GET'])
 def orders_by_telegram(telegram_id):
-    conn = db._connect()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM orders WHERE telegram_id = ? ORDER BY id DESC LIMIT 20', (str(telegram_id),))
-    orders = [dict(row) for row in cursor.fetchall()]
-    conn.close()
+    orders = db.get_orders_by_telegram_id(telegram_id)
     return jsonify(orders)
 
 
