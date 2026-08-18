@@ -81,6 +81,16 @@ def send_help(message):
     bot.reply_to(message, help_text, parse_mode="Markdown")
 
 
+@bot.message_handler(commands=['whoami'])
+def whoami(message):
+    bot.send_message(
+        message.chat.id,
+        f"Твой ID: `{message.chat.id}`\n"
+        f"Username: @{message.from_user.username}\n"
+        f"ADMIN_CHAT_ID в конфиге: `{config.ADMIN_CHAT_ID}`\n"
+        f"Совпадает: {str(message.chat.id) == str(config.ADMIN_CHAT_ID)}"
+    )
+
 # ============ КОМАНДЫ АДМИНИСТРАТОРА ============
 
 @bot.message_handler(commands=['orders'])
