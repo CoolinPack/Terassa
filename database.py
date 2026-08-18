@@ -1,7 +1,12 @@
 import sqlite3
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from config import config
+
+VN_TZ = timezone(timedelta(hours=7))
+
+def vn_now_str():
+    return datetime.now(VN_TZ).strftime('%d.%m.%Y %H:%M')
 
 
 class Database:
@@ -97,7 +102,7 @@ class Database:
             json.dumps(order_data['items'], ensure_ascii=False),
             int(order_data['total']),
             order_data['delivery_type'],
-            datetime.now().strftime('%d.%m.%Y %H:%M')
+            vn_now_str()
         ))
 
         order_id = cursor.lastrowid
@@ -129,6 +134,17 @@ class Database:
         conn.close()
         return dict(order) if order else None
 
+    def get_orders_by_telegram_id(self, telegram_id, limit=20):
+        conn = self._connect()
+        cursor = conn.cursor()
+        cursor.execute(
+            'SELECT * FROM orders WHERE telegram_id = ? ORDER BY id DESC LIMIT ?',
+            (str(telegram_id), limit)
+        )
+        orders = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return orders
+
     def get_menu(self):
         conn = self._connect()
         cursor = conn.cursor()
@@ -157,7 +173,7 @@ class Database:
         dish = dish_data or self.get_dish_by_id(dish_id) or {}
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        now = datetime.now().strftime('%d.%m.%Y %H:%M')
+        now = vn_now_str()
 
         cursor.execute('''
             INSERT INTO menu_stop_list (dish_id, enabled, name, price, category, updated_at)
@@ -262,7 +278,7 @@ class Database:
             dish_data.get('image_path', ''),
             dish_data.get('is_popular', 0),
             dish_data.get('stop_list', 0),
-            datetime.now().strftime('%d.%m.%Y %H:%M')
+            vn_now_str()
         ))
         dish_id = cursor.lastrowid
         conn.commit()
