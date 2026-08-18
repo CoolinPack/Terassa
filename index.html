@@ -1561,7 +1561,7 @@ body{background:#f5f2ed;color:var(--ink);}
                     <button id="deliveryPickup" class="active" onclick="setDelivery('pickup')">Заберу с собой</button>
                     <button id="deliveryDelivery" onclick="setDelivery('delivery')">Доставка</button>
                 </div>
-                ${!user?.username ? `
+                ${!(window.Telegram?.WebApp?.initDataUnsafe?.user?.username || user?.username) ? `
                     <div class="checkout-warning">
                         <strong>Невозможно связаться в Telegram</strong>
                         У вас не установлен username. После оформления заказа администратор не сможет написать вам напрямую. Установите username в настройках Telegram или сохраните номер заказа для связи вручную.
