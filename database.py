@@ -8,8 +8,8 @@ VN_TZ = timezone(timedelta(hours=7))
 def vn_now_str():
     return datetime.now(VN_TZ).strftime('%d.%m.%Y %H:%M')
 
-
 class Database:
+
     def __init__(self):
         self.db_path = config.DATABASE_PATH
         self.init_db()
@@ -55,8 +55,6 @@ class Database:
             )
         ''')
 
-        # Отдельная таблица позволяет стоп-листу работать и для блюд,
-        # которые пока отображаются из статического MENU в index.html.
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS menu_stop_list (
                 dish_id INTEGER PRIMARY KEY,
@@ -68,7 +66,20 @@ class Database:
             )
         ''')
 
-        # Безопасная миграция старой базы: существующие данные не удаляются.
+        # Таблица пользователей — хранит актуальный username и данные
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                telegram_id TEXT PRIMARY KEY,
+                username TEXT,
+                first_name TEXT,
+                last_name TEXT,
+                birth_date TEXT,
+                gender TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+        ''')
+
         self._add_column_if_missing(cursor, 'orders', 'telegram_username', 'TEXT')
         self._add_column_if_missing(cursor, 'orders', 'telegram_id', 'TEXT')
         self._add_column_if_missing(cursor, 'orders', 'user_phone', "TEXT DEFAULT ''")
@@ -83,10 +94,40 @@ class Database:
         if column not in columns:
             cursor.execute(f'ALTER TABLE {table} ADD COLUMN {column} {definition}')
 
+    # ============ USERS ============
+
+    def upsert_user(self, telegram_id, username=None, first_name=None, last_name=None, birth_date=None, gender=None):
+        """Создать или обновить пользователя. Username всегда обновляется."""
+        conn = self._connect()
+        cursor = conn.cursor()
+        now = vn_now_str()
+        cursor.execute('''
+            INSERT INTO users (telegram_id, username, first_name, last_name, birth_date, gender, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(telegram_id) DO UPDATE SET
+                username = excluded.username,
+                first_name = COALESCE(excluded.first_name, users.first_name),
+                last_name = COALESCE(excluded.last_name, users.last_name),
+                birth_date = COALESCE(excluded.birth_date, users.birth_date),
+                gender = COALESCE(excluded.gender, users.gender),
+                updated_at = excluded.updated_at
+        ''', (str(telegram_id), username, first_name, last_name, birth_date, gender, now, now))
+        conn.commit()
+        conn.close()
+
+    def get_user(self, telegram_id):
+        conn = self._connect()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM users WHERE telegram_id = ?', (str(telegram_id),))
+        row = cursor.fetchone()
+        conn.close()
+        return dict(row) if row else None
+
+    # ============ ORDERS ============
+
     def save_order(self, order_data):
         conn = self._connect()
         cursor = conn.cursor()
-
         cursor.execute('''
             INSERT INTO orders
             (user_name, user_surname, user_phone, user_birth_year,
@@ -104,7 +145,6 @@ class Database:
             order_data['delivery_type'],
             vn_now_str()
         ))
-
         order_id = cursor.lastrowid
         conn.commit()
         conn.close()
@@ -119,9 +159,8 @@ class Database:
         return orders
 
     def update_order_status(self, order_id, status):
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        cursor.execute('UPDATE orders SET status = ? WHERE id = ?', (status, order_id))
+        conn = self._connect()
+        conn.execute('UPDATE orders SET status = ? WHERE id = ?', (status, order_id))
         conn.commit()
         conn.close()
         return True
@@ -144,6 +183,8 @@ class Database:
         orders = [dict(row) for row in cursor.fetchall()]
         conn.close()
         return orders
+
+    # ============ MENU ============
 
     def get_menu(self):
         conn = self._connect()
@@ -174,7 +215,6 @@ class Database:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         now = vn_now_str()
-
         cursor.execute('''
             INSERT INTO menu_stop_list (dish_id, enabled, name, price, category, updated_at)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -185,15 +225,10 @@ class Database:
                 category = excluded.category,
                 updated_at = excluded.updated_at
         ''', (
-            dish_id,
-            1 if enabled else 0,
-            dish.get('name', ''),
-            dish.get('price', 0),
-            dish.get('category', ''),
-            now
+            dish_id, 1 if enabled else 0,
+            dish.get('name', ''), dish.get('price', 0),
+            dish.get('category', ''), now
         ))
-
-        # Если блюдо существует в основной таблице меню, синхронизируем и её.
         cursor.execute('UPDATE menu SET stop_list = ? WHERE id = ?', (1 if enabled else 0, dish_id))
         conn.commit()
         conn.close()
@@ -204,7 +239,6 @@ class Database:
         cursor = conn.cursor()
         cursor.execute('SELECT dish_id FROM menu_stop_list WHERE enabled = 1')
         ids = [int(row[0]) for row in cursor.fetchall()]
-        # Старые записи из menu тоже учитываем.
         cursor.execute('SELECT id FROM menu WHERE stop_list = 1')
         ids.extend(int(row[0]) for row in cursor.fetchall())
         conn.close()
@@ -220,12 +254,9 @@ class Database:
             item = dict(row)
             if not any(int(x.get('dish_id', -1)) == int(item['id']) for x in result):
                 result.append({
-                    'dish_id': item['id'],
-                    'enabled': 1,
-                    'name': item['name'],
-                    'price': item['price'],
-                    'category': item['category'],
-                    'updated_at': item.get('created_at', '')
+                    'dish_id': item['id'], 'enabled': 1,
+                    'name': item['name'], 'price': item['price'],
+                    'category': item['category'], 'updated_at': item.get('created_at', '')
                 })
         conn.close()
         return result
@@ -234,7 +265,6 @@ class Database:
         dish = self.get_dish_by_id(dish_id)
         if not dish:
             return []
-
         conn = self._connect()
         cursor = conn.cursor()
         cursor.execute('''
@@ -253,10 +283,7 @@ class Database:
     def update_dish_image(self, dish_id, image_path):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        cursor.execute(
-            'UPDATE menu SET image_path = ? WHERE id = ?',
-            (image_path, dish_id)
-        )
+        cursor.execute('UPDATE menu SET image_path = ? WHERE id = ?', (image_path, dish_id))
         conn.commit()
         conn.close()
         return True
@@ -270,15 +297,10 @@ class Database:
              is_popular, stop_list, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            dish_data['name'],
-            dish_data['price'],
-            dish_data['category'],
-            dish_data.get('ingredients', ''),
-            dish_data.get('description', ''),
-            dish_data.get('image_path', ''),
-            dish_data.get('is_popular', 0),
-            dish_data.get('stop_list', 0),
-            vn_now_str()
+            dish_data['name'], dish_data['price'], dish_data['category'],
+            dish_data.get('ingredients', ''), dish_data.get('description', ''),
+            dish_data.get('image_path', ''), dish_data.get('is_popular', 0),
+            dish_data.get('stop_list', 0), vn_now_str()
         ))
         dish_id = cursor.lastrowid
         conn.commit()
@@ -292,6 +314,5 @@ class Database:
         conn.commit()
         conn.close()
         return True
-
 
 db = Database()
