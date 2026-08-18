@@ -828,6 +828,21 @@ body{background:#f5f2ed;color:var(--ink);}
 .stopped-badge{margin-left:0;}
 .admin-dish-controls{margin-top:8px;}
 .admin-dish-controls button{border-radius:8px;}
+.admin-stop-panel{display:flex;gap:8px;margin:18px 0 6px;}
+.admin-stop-panel button{flex:1;border:1px solid var(--line);border-radius:12px;padding:11px 8px;background:#fff;font:700 12px 'Inter',sans-serif;cursor:pointer;}
+.admin-stop-panel .stop-main{color:var(--danger);background:#fdf1ef;border-color:#efd1cd;}
+.admin-stop-panel .unstopp-main{color:var(--success);background:#eef6ef;border-color:#d4e5d5;}
+.admin-stop-modal{position:fixed;inset:0;background:rgba(25,20,16,.42);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease;z-index:260;}
+.admin-stop-modal.open{opacity:1;visibility:visible;}
+.admin-stop-modal-box{width:min(430px,100%);max-height:78vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(22px);transition:transform .28s cubic-bezier(.2,.8,.2,1);}
+.admin-stop-modal.open .admin-stop-modal-box{transform:translateY(0);}
+.admin-stop-option{width:100%;border:1px solid #e8e2da;background:#fff;border-radius:13px;padding:12px;text-align:left;margin-bottom:8px;cursor:pointer;font:600 13px 'Inter',sans-serif;color:var(--ink);}
+.admin-stop-option small{display:block;margin-top:3px;color:var(--muted);font-weight:500;}
+.stop-message{margin-top:7px;padding:10px 11px;border-radius:10px;background:#fbf3f1;color:#7d4a43;font-size:11.5px;line-height:1.45;}
+.recommendations{margin-top:8px;display:flex;gap:6px;overflow-x:auto;}
+.recommendation-chip{flex:0 0 auto;border:1px solid #e3ddd4;background:#f8f4ee;border-radius:10px;padding:7px 9px;text-align:left;cursor:pointer;}
+.recommendation-chip strong{display:block;font-size:11px;color:var(--ink);max-width:145px;line-height:1.25;}
+.recommendation-chip span{display:block;margin-top:2px;font-size:10px;color:var(--primary);font-weight:700;}
 
 .modal-box{padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));}
 .modal-box h3{font-size:20px;}
@@ -1115,7 +1130,7 @@ body{background:#f5f2ed;color:var(--ink);}
     // 2. СОСТОЯНИЕ
     // ============================================================
 
-    const ADMIN_ID = 8166237921; // ТВОЙ TELEGRAM ID (для админ-панели)
+    const API_BASE = 'https://terassa.onrender.com';
 
     let cart = [];
     let user = null;
@@ -1130,47 +1145,65 @@ body{background:#f5f2ed;color:var(--ink);}
     // 3. АВТОРИЗАЦИЯ (МИНИ-АНКЕТА)
     // ============================================================
 
-    function authUser() {
+    function getTelegramUser() {
+        return window.Telegram?.WebApp?.initDataUnsafe?.user || null;
+    }
+
+    function getTelegramUserId() {
+        return getTelegramUser()?.id || user?.telegramId || null;
+    }
+
+    async function refreshAdminStatus() {
+        if (!user) return false;
+        const telegramId = getTelegramUserId();
+        if (!telegramId) {
+            user.isAdmin = false;
+            document.getElementById('adminIndicator').style.display = 'none';
+            return false;
+        }
+        try {
+            const response = await fetch(`${API_BASE}/admin/check?telegram_id=${encodeURIComponent(telegramId)}`, { cache: 'no-store' });
+            const result = await response.json();
+            user.isAdmin = result.is_admin === true;
+            user.telegramId = telegramId;
+            document.getElementById('adminIndicator').style.display = user.isAdmin ? 'inline' : 'none';
+            saveUserToStorage();
+            return user.isAdmin;
+        } catch (e) {
+            user.isAdmin = false;
+            document.getElementById('adminIndicator').style.display = 'none';
+            return false;
+        }
+    }
+
+    async function authUser() {
         const name = document.getElementById('authName').value.trim();
         const surname = document.getElementById('authSurname').value.trim();
         const birth = document.getElementById('authBirth').value;
         const gender = document.getElementById('authGender').value;
+        const tgUser = getTelegramUser();
 
         if (!name || !surname) {
             alert('Заполните обязательные поля: Имя и Фамилия');
             return;
         }
 
-        // Получаем username из Telegram если есть
-        let username = null;
-        if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-            username = window.Telegram.WebApp.initDataUnsafe.user.username || null;
-        }
-
         user = {
-            name: name,
-            surname: surname,
+            name,
+            surname,
             birthDate: birth,
             gender: gender || 'Не указан',
-            username: username,
-            // Для админа используем специальный ключ (можно установить вручную)
-            isAdmin: false // Админ определяется по отдельному признаку
+            username: tgUser?.username || null,
+            telegramId: tgUser?.id || null,
+            isAdmin: false
         };
-
-        // Если хочешь сделать админа по имени или другому признаку
-        if (name === 'Admin' || name === 'Админ') {
-            user.isAdmin = true;
-        }
 
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
-        
-        if (user.isAdmin) {
-            document.getElementById('adminIndicator').style.display = 'inline';
-        }
-        
-        renderAll();
         saveUserToStorage();
+        await refreshAdminStatus();
+        await loadStoppedItems();
+        renderAll();
     }
 
     function saveUserToStorage() {
@@ -1183,13 +1216,8 @@ body{background:#f5f2ed;color:var(--ink);}
         try {
             const data = localStorage.getItem('terassa_user');
             if (data) {
-                const savedUser = JSON.parse(data);
-                // Не восстанавливаем isAdmin из localStorage (безопасность)
-                user = savedUser;
+                user = JSON.parse(data);
                 user.isAdmin = false;
-                if (user.name === 'Admin' || user.name === 'Админ') {
-                    user.isAdmin = true;
-                }
                 return true;
             }
         } catch(e) {}
@@ -1296,36 +1324,100 @@ body{background:#f5f2ed;color:var(--ink);}
         return filtered;
     }
 
-    function toggleStopList(id) {
-        if (!user?.isAdmin) return;
-        const index = stoppedItems.indexOf(id);
-        if (index > -1) {
-            stoppedItems.splice(index, 1);
-        } else {
-            stoppedItems.push(id);
+    async function loadStoppedItems() {
+        try {
+            const response = await fetch(`${API_BASE}/menu`, { cache: 'no-store' });
+            if (!response.ok) return;
+            const serverMenu = await response.json();
+            stoppedItems = serverMenu.filter(d => Number(d.stop_list) === 1).map(d => Number(d.id));
+            renderMenu();
+        } catch (e) {
+            console.warn('Не удалось загрузить стоп-лист', e);
         }
-        saveStoppedItems();
-        renderMenu();
     }
 
-    function saveStoppedItems() {
+    async function setStopList(id, enabled) {
+        if (!user?.isAdmin) return;
+        const telegramId = getTelegramUserId();
+        if (!telegramId) return;
         try {
-            localStorage.setItem('terassa_stopped', JSON.stringify(stoppedItems));
-        } catch(e) {}
+            const response = await fetch(`${API_BASE}/admin/stop-list`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegram_id: telegramId, dish_id: id, enabled, name: MENU.find(d => d.id === id)?.name || '', price: MENU.find(d => d.id === id)?.price || 0, category: MENU.find(d => d.id === id)?.category || '' })
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                alert(result.error || 'Не удалось изменить стоп-лист');
+                return;
+            }
+            await loadStoppedItems();
+            if (document.getElementById('adminStopModal')?.classList.contains('open')) {
+                showAdminStopChooser(enabled);
+            }
+        } catch (e) {
+            alert('Ошибка соединения с сервером.');
+        }
     }
 
-    function loadStoppedItems() {
-        try {
-            const data = localStorage.getItem('terassa_stopped');
-            if (data) stoppedItems = JSON.parse(data);
-        } catch(e) {}
+    function showAdminStopChooser(enabled) {
+        if (!user?.isAdmin) return;
+        const title = document.getElementById('adminStopModalTitle');
+        const text = document.getElementById('adminStopModalText');
+        const list = document.getElementById('adminStopDishList');
+        if (!title || !text || !list) return;
+        title.textContent = enabled ? 'Добавить в стоп-лист' : 'Убрать из стоп-листа';
+        text.textContent = enabled ? 'Выберите блюдо из текущей категории, которое временно недоступно.' : 'Выберите блюдо из текущей категории, которое снова доступно.';
+        const dishes = getFilteredMenu().filter(d => enabled ? !stoppedItems.includes(d.id) : stoppedItems.includes(d.id));
+        if (!dishes.length) {
+            list.innerHTML = `<div class="empty-state" style="padding:25px 10px;"><p>${enabled ? 'Все блюда этой категории уже доступны.' : 'В этой категории нет блюд в стоп-листе.'}</p></div>`;
+        } else {
+            list.innerHTML = dishes.map(d => `
+                <button class="admin-stop-option" onclick="setStopList(${d.id}, ${enabled ? 'true' : 'false'})">
+                    ${d.name}
+                    <small>${formatPrice(d.price)}${enabled ? '' : ' • сейчас в стоп-листе'}</small>
+                </button>
+            `).join('');
+        }
+        document.getElementById('adminStopModal').classList.add('open');
+    }
+
+    function closeAdminStopModal() {
+        document.getElementById('adminStopModal')?.classList.remove('open');
+    }
+
+    function showStopRecommendations(dishId) {
+        const container = document.getElementById(`recommendations-${dishId}`);
+        if (!container || container.dataset.loaded === '1') return;
+        const dish = MENU.find(d => d.id === dishId);
+        if (!dish) return;
+        container.dataset.loaded = '1';
+
+        const sameCategory = MENU.filter(d =>
+            d.id !== dishId &&
+            d.category === dish.category &&
+            !stoppedItems.includes(d.id)
+        );
+        const otherPopular = MENU.filter(d =>
+            d.id !== dishId &&
+            d.category !== dish.category &&
+            d.popular &&
+            !stoppedItems.includes(d.id)
+        );
+        const recommendations = [...sameCategory, ...otherPopular].slice(0, 3);
+        if (!recommendations.length) return;
+
+        container.innerHTML = recommendations.map(item => `
+            <button class="recommendation-chip" onclick="addToCart(${item.id})">
+                <strong>${item.name}</strong><span>${formatPrice(item.price)}</span>
+            </button>
+        `).join('');
     }
 
     function renderDishItem(dish) {
         const inCart = cart.find(c => c.id === dish.id);
         const qty = inCart ? inCart.quantity : 0;
         const isStopped = stoppedItems.includes(dish.id);
-
         return `
             <div class="dish-item ${isStopped ? 'stopped' : ''}">
                 <div class="dish-main">
@@ -1335,15 +1427,16 @@ body{background:#f5f2ed;color:var(--ink);}
                             ${isStopped ? '<span class="stopped-badge">СТОП</span>' : ''}
                         </div>
                         <div class="price">${formatPrice(dish.price)}</div>
-                        ${dish.ingredients && dish.ingredients.length ? `
-                            <button class="show-ingredients" onclick="showIngredients(${dish.id})">Состав</button>
+                        ${dish.ingredients && dish.ingredients.length ? `<button class="show-ingredients" onclick="showIngredients(${dish.id})">Состав</button>` : ''}
+                        ${isStopped ? `
+                            <div class="stop-message">
+                                Временно недоступно. Загляните к нам чуть позже или выберите что-нибудь другое.
+                                <div class="recommendations" id="recommendations-${dish.id}"></div>
+                            </div>
                         ` : ''}
                         ${user?.isAdmin ? `
                             <div class="admin-dish-controls">
-                                ${isStopped ?
-                                    `<button class="unstop-btn" onclick="toggleStopList(${dish.id})">Убрать из стоп-листа</button>` :
-                                    `<button class="stop-btn" onclick="toggleStopList(${dish.id})">В стоп-лист</button>`
-                                }
+                                ${isStopped ? `<button class="unstop-btn" onclick="setStopList(${dish.id}, false)">Убрать из стоп-листа</button>` : `<button class="stop-btn" onclick="setStopList(${dish.id}, true)">В стоп-лист</button>`}
                             </div>
                         ` : ''}
                     </div>
@@ -1371,7 +1464,16 @@ body{background:#f5f2ed;color:var(--ink);}
             html += '<div class="menu-note">Все пельмени подаются на выбор: в ароматном бульоне или без него. Подаются со сметаной.</div>';
         }
         html += filtered.map(renderDishItem).join('');
+        if (user?.isAdmin) {
+            html += `
+                <div class="admin-stop-panel">
+                    <button class="stop-main" onclick="showAdminStopChooser(true)">Стоп-лист</button>
+                    <button class="unstopp-main" onclick="showAdminStopChooser(false)">Убрать из стоп-листа</button>
+                </div>
+            `;
+        }
         container.innerHTML = html;
+        filtered.filter(d => stoppedItems.includes(d.id)).forEach(d => showStopRecommendations(d.id));
     }
 
     function formatPrice(price) {
@@ -1517,12 +1619,24 @@ body{background:#f5f2ed;color:var(--ink);}
             alert('Пожалуйста, войдите в систему');
             return;
         }
+
+        // Перед оформлением заказа ещё раз берём username напрямую из Telegram.
+        // Так предупреждение появляется только если username действительно отсутствует.
+        try {
+            const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            if (tgUser) {
+                user.username = tgUser.username || null;
+                saveUserToStorage();
+            }
+        } catch (e) {}
+
         const orderData = {
             user_name: user.name,
             user_surname: user.surname,
             user_birth_year: user.birthDate || '',
             user_gender: user.gender || '',
             username: user.username || 'Не указан',
+            telegram_id: getTelegramUserId() || '',
             items: cart.map(item => ({
                 id: item.id,
                 name: item.name,
@@ -1534,7 +1648,7 @@ body{background:#f5f2ed;color:var(--ink);}
         };
 
         try {
-            const response = await fetch('https://terassa.onrender.com/webhook', {
+            const response = await fetch(`${API_BASE}/webhook`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderData),
@@ -1720,7 +1834,6 @@ body{background:#f5f2ed;color:var(--ink);}
     // ============================================================
 
     function renderAll() {
-        loadStoppedItems();
         loadOrdersFromStorage();
         renderCategoryTabs();
         renderPopular();
@@ -1729,16 +1842,32 @@ body{background:#f5f2ed;color:var(--ink);}
         renderProfile();
         updateBadge();
         navigateTo('pageHome');
+        loadStoppedItems();
+    }
+
+    // Синхронизируем username с Telegram при каждом открытии приложения.
+    // Это важно, если пользователь установил username уже после регистрации.
+    async function syncTelegramUser() {
+        try {
+            const tgUser = getTelegramUser();
+            if (!tgUser || !user) return;
+            user.username = tgUser.username || null;
+            user.telegramId = tgUser.id || null;
+            saveUserToStorage();
+            await refreshAdminStatus();
+            await loadStoppedItems();
+            renderCart();
+            renderProfile();
+            renderMenu();
+        } catch (e) {}
     }
 
     // Проверяем сохранённого пользователя
     if (loadUserFromStorage()) {
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
-        if (user.isAdmin) {
-            document.getElementById('adminIndicator').style.display = 'inline';
-        }
         renderAll();
+        syncTelegramUser();
     }
 
     // Telegram WebApp
@@ -1747,6 +1876,16 @@ body{background:#f5f2ed;color:var(--ink);}
             window.Telegram.WebApp.expand();
             const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
             if (tgUser) {
+                if (user) {
+                    user.username = tgUser.username || null;
+                    user.telegramId = tgUser.id || null;
+                    saveUserToStorage();
+                    refreshAdminStatus();
+                    loadStoppedItems();
+                    renderCart();
+                    renderProfile();
+                    renderMenu();
+                }
                 if (!document.getElementById('authName').value) {
                     document.getElementById('authName').value = tgUser.first_name || '';
                 }
@@ -1761,5 +1900,15 @@ body{background:#f5f2ed;color:var(--ink);}
     console.log('Админ режим:', user?.isAdmin || false);
 </script>
 
+
+<div class="admin-stop-modal" id="adminStopModal" onclick="if(event.target===this) closeAdminStopModal()">
+    <div class="admin-stop-modal-box">
+        <div class="feature-modal-kicker">Управление меню</div>
+        <h3 class="feature-modal-title" id="adminStopModalTitle">Стоп-лист</h3>
+        <p class="feature-modal-text" id="adminStopModalText">Выберите блюдо.</p>
+        <div id="adminStopDishList" style="margin-top:16px;"></div>
+        <button class="feature-modal-close" onclick="closeAdminStopModal()">Закрыть</button>
+    </div>
+</div>
 </body>
 </html>
