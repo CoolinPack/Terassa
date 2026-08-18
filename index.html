@@ -733,18 +733,13 @@ body{background:#f5f2ed;color:var(--ink);}
 .page{padding:24px 16px 14px;min-height:calc(100vh - 84px);}
 .page-title{font-family:'Inter',sans-serif;font-size:24px;letter-spacing:-.4px;}
 .bottom-nav{
-  left:50%;
-  bottom:20px;
-  width:calc(100% - 20px);
-  max-width:410px;
-  background:rgba(255,255,255,.97);
-  border:1px solid #e5dfd6;
-  border-radius:30px;
-  box-shadow:0 10px 30px rgba(30,24,20,.12);
-  padding:9px 10px;
+    background:rgba(255,255,255,.96);
+    border-top:1px solid #e5dfd6;
+    box-shadow:0 -8px 30px rgba(30,24,20,.06);
+    padding:8px 8px calc(8px + env(safe-area-inset-bottom,6px));
 }
 .bottom-nav button{
-    min-width:68px;padding:8px 12px;border-radius:16px;font-size:12px;
+    min-width:72px;padding:9px 12px;border-radius:12px;font-size:12px;
     font-weight:600;color:#8b847c;
 }
 .bottom-nav button.active{background:#f0ebe4;color:var(--primary);}
@@ -837,13 +832,6 @@ body{background:#f5f2ed;color:var(--ink);}
 .admin-stop-panel button{flex:1;border:1px solid var(--line);border-radius:12px;padding:11px 8px;background:#fff;font:700 12px 'Inter',sans-serif;cursor:pointer;}
 .admin-stop-panel .stop-main{color:var(--danger);background:#fdf1ef;border-color:#efd1cd;}
 .admin-stop-panel .unstopp-main{color:var(--success);background:#eef6ef;border-color:#d4e5d5;}
-.admin-stop-panel .add-dish-main{color:#70552e;background:#fbf5e9;border-color:#e7d4b2;}
-.add-dish-modal{position:fixed;inset:0;background:rgba(25,20,16,.42);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease;z-index:270;}
-.add-dish-modal.open{opacity:1;visibility:visible;}
-.add-dish-modal-box{width:min(430px,100%);max-height:86vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(22px);transition:transform .28s cubic-bezier(.2,.8,.2,1);}
-.add-dish-modal.open .add-dish-modal-box{transform:translateY(0);}
-.add-dish-field{width:100%;border:1px solid #ded7cf;border-radius:12px;padding:12px 13px;margin-top:8px;font:500 13px 'Inter',sans-serif;outline:none;background:#fff;}
-.add-dish-field:focus{border-color:var(--primary);}
 .admin-stop-modal{position:fixed;inset:0;background:rgba(25,20,16,.42);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease;z-index:260;}
 .admin-stop-modal.open{opacity:1;visibility:visible;}
 .admin-stop-modal-box{width:min(430px,100%);max-height:78vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(22px);transition:transform .28s cubic-bezier(.2,.8,.2,1);}
@@ -1032,7 +1020,7 @@ body{background:#f5f2ed;color:var(--ink);}
     // 1. МЕНЮ (полное)
     // ============================================================
 
-    let MENU = [
+    const MENU = [
         { id: 1, name: 'Тартар из тунца с авокадо', price: 160000, category: 'Салаты', ingredients: 'тунец, авокадо, красный лук, оливковое масло, специи.', popular: true },
         { id: 2, name: 'Цезарь с креветками', price: 150000, category: 'Салаты', ingredients: 'листья салата, креветки, томаты черри, перепелиные яйца, хрустящие сухарики, фирменный соус «Цезарь».', popular: true },
         { id: 3, name: 'Цезарь с курицей', price: 130000, category: 'Салаты', ingredients: 'листья салата, куриное филе, томаты черри, перепелиные яйца, хрустящие сухарики, фирменный соус «Цезарь».', popular: false },
@@ -1158,23 +1146,7 @@ body{background:#f5f2ed;color:var(--ink);}
     // ============================================================
 
     function getTelegramUser() {
-        const webApp = window.Telegram?.WebApp;
-        const unsafeUser = webApp?.initDataUnsafe?.user;
-        if (unsafeUser) return unsafeUser;
-
-        // Резервный разбор подписанного initData. Это помогает, если
-        // Telegram ещё не успел заполнить initDataUnsafe при первом рендере.
-        try {
-            const params = new URLSearchParams(webApp?.initData || '');
-            const raw = params.get('user');
-            if (raw) return JSON.parse(raw);
-        } catch (e) {}
-        return null;
-    }
-
-    function getTelegramUsername() {
-        const tgUser = getTelegramUser();
-        return tgUser?.username || user?.username || null;
+        return window.Telegram?.WebApp?.initDataUnsafe?.user || null;
     }
 
     function getTelegramUserId() {
@@ -1221,7 +1193,7 @@ body{background:#f5f2ed;color:var(--ink);}
             surname,
             birthDate: birth,
             gender: gender || 'Не указан',
-            username: tgUser?.username || user?.username || null,
+            username: tgUser?.username || null,
             telegramId: tgUser?.id || null,
             isAdmin: false
         };
@@ -1327,7 +1299,7 @@ body{background:#f5f2ed;color:var(--ink);}
         if (dropdown && !dropdown.contains(e.target)) closeCategoryDropdown();
     });
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') { closeCategoryDropdown(); closeFeature(); closeAdminStopModal(); closeAddDishModal(); }
+        if (e.key === 'Escape') { closeCategoryDropdown(); closeFeature(); }
     });
 
     function filterMenu() {
@@ -1352,45 +1324,15 @@ body{background:#f5f2ed;color:var(--ink);}
         return filtered;
     }
 
-    function normalizeServerDish(dish) {
-        const ingredients = Array.isArray(dish.ingredients)
-            ? dish.ingredients
-            : String(dish.ingredients || '').split(',').map(x => x.trim()).filter(Boolean);
-        return {
-            ...dish,
-            id: Number(dish.id),
-            price: Number(dish.price || 0),
-            ingredients,
-            popular: Boolean(Number(dish.is_popular || 0) || dish.popular)
-        };
-    }
-
     async function loadStoppedItems() {
         try {
             const response = await fetch(`${API_BASE}/menu`, { cache: 'no-store' });
             if (!response.ok) return;
-            const serverMenuRaw = await response.json();
-            const serverMenu = Array.isArray(serverMenuRaw) ? serverMenuRaw.map(normalizeServerDish) : [];
-
-            // Сохраняем текущий большой статический каталог и добавляем в него
-            // блюда, созданные администратором через приложение.
-            const byId = new Map(MENU.map(d => [Number(d.id), d]));
-            serverMenu.forEach(serverDish => {
-                const existing = byId.get(serverDish.id);
-                if (existing) {
-                    existing.stop_list = Number(serverDish.stop_list) === 1;
-                    if (!existing.ingredients?.length && serverDish.ingredients.length) existing.ingredients = serverDish.ingredients;
-                } else {
-                    byId.set(serverDish.id, serverDish);
-                }
-            });
-            MENU = Array.from(byId.values());
-
+            const serverMenu = await response.json();
             stoppedItems = serverMenu.filter(d => Number(d.stop_list) === 1).map(d => Number(d.id));
-            renderCategoryTabs();
             renderMenu();
         } catch (e) {
-            console.warn('Не удалось загрузить меню/стоп-лист', e);
+            console.warn('Не удалось загрузить стоп-лист', e);
         }
     }
 
@@ -1438,56 +1380,6 @@ body{background:#f5f2ed;color:var(--ink);}
             `).join('');
         }
         document.getElementById('adminStopModal').classList.add('open');
-    }
-
-    async function addDishFromCategory() {
-        if (!user?.isAdmin) return;
-        const name = document.getElementById('newDishName')?.value.trim();
-        const price = Number(document.getElementById('newDishPrice')?.value || 0);
-        const category = currentCategory;
-        const ingredients = document.getElementById('newDishIngredients')?.value.trim() || '';
-        const description = document.getElementById('newDishDescription')?.value.trim() || '';
-
-        if (!name || !price || price <= 0) {
-            alert('Укажите название и цену блюда.');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_BASE}/admin/add-dish`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    telegram_id: getTelegramUserId(),
-                    name, price, category, ingredients, description
-                })
-            });
-            const result = await response.json();
-            if (!response.ok || !result.success) {
-                alert(result.error || 'Не удалось добавить блюдо.');
-                return;
-            }
-            closeAddDishModal();
-            await loadStoppedItems();
-            alert(`Блюдо «${name}» добавлено в категорию «${category}».`);
-        } catch (e) {
-            alert('Ошибка соединения с сервером.');
-        }
-    }
-
-    function openAddDishModal() {
-        if (!user?.isAdmin) return;
-        document.getElementById('newDishCategory').textContent = currentCategory;
-        document.getElementById('newDishName').value = '';
-        document.getElementById('newDishPrice').value = '';
-        document.getElementById('newDishIngredients').value = '';
-        document.getElementById('newDishDescription').value = '';
-        document.getElementById('addDishModal').classList.add('open');
-        setTimeout(() => document.getElementById('newDishName')?.focus(), 120);
-    }
-
-    function closeAddDishModal() {
-        document.getElementById('addDishModal')?.classList.remove('open');
     }
 
     function closeAdminStopModal() {
@@ -1576,8 +1468,7 @@ body{background:#f5f2ed;color:var(--ink);}
             html += `
                 <div class="admin-stop-panel">
                     <button class="stop-main" onclick="showAdminStopChooser(true)">Стоп-лист</button>
-                    <button class="unstopp-main" onclick="showAdminStopChooser(false)">Убрать</button>
-                    <button class="add-dish-main" onclick="openAddDishModal()">＋ Добавить блюдо</button>
+                    <button class="unstopp-main" onclick="showAdminStopChooser(false)">Убрать из стоп-листа</button>
                 </div>
             `;
         }
@@ -1734,7 +1625,7 @@ body{background:#f5f2ed;color:var(--ink);}
         try {
             const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
             if (tgUser) {
-                user.username = tgUser.username || user.username || null;
+                user.username = tgUser.username || null;
                 saveUserToStorage();
             }
         } catch (e) {}
@@ -1744,7 +1635,7 @@ body{background:#f5f2ed;color:var(--ink);}
             user_surname: user.surname,
             user_birth_year: user.birthDate || '',
             user_gender: user.gender || '',
-            username: getTelegramUsername() || 'Не указан',
+            username: user.username || 'Не указан',
             telegram_id: getTelegramUserId() || '',
             items: cart.map(item => ({
                 id: item.id,
@@ -1960,7 +1851,7 @@ body{background:#f5f2ed;color:var(--ink);}
         try {
             const tgUser = getTelegramUser();
             if (!tgUser || !user) return;
-            user.username = tgUser.username || user.username || null;
+            user.username = tgUser.username || null;
             user.telegramId = tgUser.id || null;
             saveUserToStorage();
             await refreshAdminStatus();
@@ -1986,7 +1877,7 @@ body{background:#f5f2ed;color:var(--ink);}
             const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
             if (tgUser) {
                 if (user) {
-                    user.username = tgUser.username || user.username || null;
+                    user.username = tgUser.username || null;
                     user.telegramId = tgUser.id || null;
                     saveUserToStorage();
                     refreshAdminStatus();
@@ -2009,20 +1900,6 @@ body{background:#f5f2ed;color:var(--ink);}
     console.log('Админ режим:', user?.isAdmin || false);
 </script>
 
-
-<div class="add-dish-modal" id="addDishModal" onclick="if(event.target===this) closeAddDishModal()">
-    <div class="add-dish-modal-box">
-        <div class="feature-modal-kicker">Управление меню</div>
-        <h3 class="feature-modal-title">Добавить блюдо</h3>
-        <p class="feature-modal-text">Категория: <strong id="newDishCategory"></strong></p>
-        <input class="add-dish-field" id="newDishName" placeholder="Название блюда">
-        <input class="add-dish-field" id="newDishPrice" type="number" min="1" placeholder="Цена в VND">
-        <input class="add-dish-field" id="newDishIngredients" placeholder="Ингредиенты (через запятую)">
-        <textarea class="add-dish-field" id="newDishDescription" rows="3" placeholder="Описание"></textarea>
-        <button class="btn-primary" style="margin-top:12px;width:100%;" onclick="addDishFromCategory()">＋ Добавить блюдо</button>
-        <button class="feature-modal-close" onclick="closeAddDishModal()">Закрыть</button>
-    </div>
-</div>
 
 <div class="admin-stop-modal" id="adminStopModal" onclick="if(event.target===this) closeAdminStopModal()">
     <div class="admin-stop-modal-box">
