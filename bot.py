@@ -24,6 +24,16 @@ upload_sessions = {}
 # Flask приложение
 app = Flask(__name__)
 
+# GitHub Pages (https://coolinpack.github.io) обращается к API с другого домена.
+# Разрешаем CORS без дополнительной зависимости flask-cors.
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    return response
+
+
 # ============ ЭНДПОИНТЫ ДЛЯ RENDER HEALTH CHECK ============
 
 @app.route('/')
@@ -253,10 +263,12 @@ def process_add_dish(message):
 
 # ============ ОБРАБОТКА ЗАКАЗОВ (WEBHOOK) ============
 
-@app.route('/webhook', methods=['POST'])
+@app.route('/webhook', methods=['POST', 'OPTIONS'])
 def webhook():
     try:
-        data = request.json
+        if request.method == 'OPTIONS':
+            return ('', 204)
+        data = request.get_json(silent=True) or {}
         
         # Проверяем обязательные поля
         required = ['user_name', 'user_surname', 'items', 'total', 'delivery_type']
@@ -353,18 +365,32 @@ def get_menu():
     return jsonify(menu)
 
 
+def normalize_id(value):
+    return str(value or '').strip()
+
+
 def is_admin_telegram_id(telegram_id):
-    return str(telegram_id or '') == str(config.ADMIN_CHAT_ID)
+    admin_id = normalize_id(config.ADMIN_CHAT_ID)
+    current_id = normalize_id(telegram_id)
+    return bool(admin_id and current_id and current_id == admin_id)
 
 
-@app.route('/admin/check', methods=['GET'])
+@app.route('/admin/check', methods=['GET', 'OPTIONS'])
 def admin_check():
-    return jsonify({'is_admin': is_admin_telegram_id(request.args.get('telegram_id', ''))})
+    if request.method == 'OPTIONS':
+        return ('', 204)
+    telegram_id = request.args.get('telegram_id', '')
+    return jsonify({
+        'is_admin': is_admin_telegram_id(telegram_id),
+        'telegram_id': telegram_id
+    })
 
 
-@app.route('/admin/stop-list', methods=['POST'])
+@app.route('/admin/stop-list', methods=['POST', 'OPTIONS'])
 def admin_stop_list():
     try:
+        if request.method == 'OPTIONS':
+            return ('', 204)
         data = request.json or {}
         telegram_id = data.get('telegram_id')
         dish_id = int(data.get('dish_id'))
@@ -388,6 +414,39 @@ def admin_stop_list():
         })
     except (TypeError, ValueError):
         return jsonify({'error': 'Некорректный ID блюда'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/admin/add-dish', methods=['POST', 'OPTIONS'])
+def admin_add_dish():
+    try:
+        if request.method == 'OPTIONS':
+            return ('', 204)
+        data = request.json or {}
+        if not is_admin_telegram_id(data.get('telegram_id')):
+            return jsonify({'error': 'Нет прав'}), 403
+
+        name = str(data.get('name', '')).strip()
+        category = str(data.get('category', '')).strip()
+        ingredients = str(data.get('ingredients', '')).strip()
+        description = str(data.get('description', '')).strip()
+        price = int(data.get('price', 0) or 0)
+        if not name or not category or price <= 0:
+            return jsonify({'error': 'Название, категория и цена обязательны'}), 400
+
+        dish_id = db.add_dish({
+            'name': name,
+            'price': price,
+            'category': category,
+            'ingredients': ingredients,
+            'description': description,
+            'is_popular': 0
+        })
+        dish = db.get_dish_by_id(dish_id)
+        return jsonify({'success': True, 'dish': dish})
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Цена должна быть числом'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
