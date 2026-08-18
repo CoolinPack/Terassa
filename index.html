@@ -242,130 +242,110 @@
         .auth-box select { appearance: none; cursor: pointer; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a8072' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") right 4px center/14px no-repeat; }
         .auth-box .btn-primary { margin-top: 8px; }
 
-        /* ===== ГЛАВНАЯ ===== */
-        .home-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 22px;
-        }
-        .home-header .brand { display: flex; align-items: center; gap: 10px; }
-        .home-header .brand-icon {
-            width: 42px; height: 42px; border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
-            box-shadow: 0 4px 12px rgba(139,58,43,0.25);
-        }
-        .home-header .greet { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+/* ===== ГЛАВНАЯ ===== */
+.home-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+.home-header .brand { display: flex; align-items: center; gap: 10px; }
+.home-header .brand-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+    box-shadow: 0 4px 12px rgba(139,58,43,0.25);
+}
+.home-header .greet { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
 
-        .discount-banner {
-            background: linear-gradient(135deg, var(--gold) 0%, var(--secondary) 100%);
-            border-radius: 20px;
-            padding: 22px 20px;
-            color: #fff;
-            margin-bottom: 22px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 26px rgba(201,169,110,0.35);
-        }
-        .discount-banner::after {
-            content: "";
-            position: absolute; right: -20px; top: -20px;
-            width: 110px; height: 110px; border-radius: 50%;
-            background: rgba(255,255,255,0.14);
-        }
-        .discount-banner h3 { font-size: 19px; font-weight: 700; margin-bottom: 4px; position: relative; }
-        .discount-banner p { position: relative; font-size: 13.5px; opacity: 0.95; }
+/* ===== БОЛЬШАЯ КНОПКА "ОТКРЫТЬ МЕНЮ" ===== */
+.btn-open-menu {
+    width: 100%;
+    padding: 20px 18px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff;
+    border: none;
+    border-radius: 18px;
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 10px 28px rgba(123, 47, 36, 0.35);
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+    letter-spacing: 0.3px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+.btn-open-menu:active {
+    transform: scale(0.97);
+    box-shadow: 0 6px 16px rgba(123, 47, 36, 0.25);
+}
+.btn-open-menu .icon { font-size: 28px; }
+.btn-open-menu .arrow { font-size: 20px; opacity: 0.8; }
 
-        .section-heading {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .section-heading h3 { font-size: 17px; font-weight: 700; }
-        .section-heading .see-all { font-size: 12.5px; color: var(--primary); font-weight: 600; cursor: pointer; }
+.discount-banner {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--secondary) 100%);
+    border-radius: 20px;
+    padding: 22px 20px;
+    color: #fff;
+    margin-bottom: 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 26px rgba(201,169,110,0.35);
+}
+.discount-banner::after {
+    content: "";
+    position: absolute; right: -20px; top: -20px;
+    width: 110px; height: 110px; border-radius: 50%;
+    background: rgba(255,255,255,0.14);
+}
+.discount-banner h3 { font-size: 19px; font-weight: 700; margin-bottom: 4px; position: relative; }
+.discount-banner p { position: relative; font-size: 13.5px; opacity: 0.95; }
 
-        .popular-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            padding: 14px 16px;
-            gap: 10px;
-        }
-        .popular-card .pc-icon {
-            width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px;
-            background: var(--cream-2);
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
-        }
-        .popular-card .pc-name { font-weight: 600; font-size: 14.5px; line-height: 1.3; }
-        .popular-card .pc-price { color: var(--primary); font-weight: 700; font-size: 13px; margin-top: 2px; }
-        .popular-card .pc-arrow { color: var(--secondary); font-size: 18px; flex-shrink: 0; }
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.section-heading h3 { font-size: 17px; font-weight: 700; }
+.section-heading .see-all { font-size: 12.5px; color: var(--primary); font-weight: 600; cursor: pointer; }
 
-        .quick-tiles {
-            margin-top: 14px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .quick-tile {
-            text-align: center;
-            cursor: pointer;
-            padding: 22px 12px;
-            transition: transform 0.15s;
-        }
-        .quick-tile:active { transform: scale(0.96); }
-        .quick-tile .qt-icon { font-size: 30px; margin-bottom: 6px; }
-        .quick-tile .qt-label { font-weight: 700; font-size: 14.5px; }
+.popular-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 14px 16px;
+    gap: 10px;
+}
+.popular-card .pc-icon {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px;
+    background: var(--cream-2);
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.popular-card .pc-name { font-weight: 600; font-size: 14.5px; line-height: 1.3; }
+.popular-card .pc-price { color: var(--primary); font-weight: 700; font-size: 13px; margin-top: 2px; }
+.popular-card .pc-arrow { color: var(--secondary); font-size: 18px; flex-shrink: 0; }
 
-        /* ===== ПОИСК / КАТЕГОРИИ ===== */
-        .search-box-wrap { position: relative; margin-bottom: 4px; }
-        .search-box-wrap .si { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; opacity: 0.55; pointer-events: none; }
-        .search-box {
-            width: 100%;
-            padding: 13px 16px 13px 40px;
-            border: 1.5px solid var(--line);
-            border-radius: 14px;
-            font-size: 15px;
-            outline: none;
-            background: #fff;
-            transition: 0.2s;
-            font-family: 'Inter', sans-serif;
-            margin-bottom: 14px;
-        }
-        .search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139,58,43,0.08); }
-
-        .category-tabs {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 2px 0 18px;
-            scrollbar-width: none;
-            flex-wrap: nowrap;
-        }
-        .category-tabs::-webkit-scrollbar { display: none; }
-        .category-tabs button {
-            background: #fff;
-            border: 1.5px solid var(--line);
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 13px;
-            white-space: nowrap;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--muted);
-            transition: 0.18s;
-            font-family: 'Inter', sans-serif;
-            flex-shrink: 0;
-        }
-        .category-tabs button.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(139,58,43,0.25);
-        }
-
+.quick-tiles {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.quick-tile {
+    text-align: center;
+    cursor: pointer;
+    padding: 22px 12px;
+    transition: transform 0.15s;
+}
+.quick-tile:active { transform: scale(0.96); }
+.quick-tile .qt-icon { font-size: 30px; margin-bottom: 6px; }
+.quick-tile .qt-label { font-weight: 700; font-size: 14.5px; }
         /* ===== БЛЮДА ===== */
         .menu-group-title {
             font-size: 12px;
@@ -923,6 +903,13 @@ body{background:#f5f2ed;color:var(--ink);}
             </div>
             <span id="adminIndicator" style="display:none;" class="admin-badge">Администратор</span>
         </div>
+
+        <!-- БОЛЬШАЯ КНОПКА "ОТКРЫТЬ МЕНЮ" -->
+        <button class="btn-open-menu" onclick="navigateTo('pageMenu')">
+            <span class="icon">🍽️</span>
+            Открыть меню
+            <span class="arrow">→</span>
+        </button>
 
         <div class="home-links">
             <button onclick="showFeature('Скидки')">Скидки</button>
