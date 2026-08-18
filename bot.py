@@ -1,5 +1,5 @@
 import telebot
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, ReplyKeyboardMarkup, KeyboardButton
 import json
 import os
 from datetime import datetime, timezone, timedelta
@@ -53,14 +53,16 @@ def health():
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    markup = InlineKeyboardMarkup()
     web_app_url = "https://coolinpack.github.io/Terassa/"
-    web_app_btn = InlineKeyboardButton(text="🍽 Открыть меню", web_app=WebAppInfo(url=web_app_url))
-    markup.add(web_app_btn)
+
+    # Кнопка внизу у поля ввода текста
+    reply_markup = ReplyKeyboardMarkup(resize_keyboard=True)
+    reply_markup.add(KeyboardButton(text="🍽 Открыть меню", web_app=WebAppInfo(url=web_app_url)))
+
     bot.send_message(
         message.chat.id,
         "🍷 Добро пожаловать в Terassa!\n\n🏛️ Ресторан итальянской кухни\n\nНажмите кнопку ниже, чтобы сделать заказ:",
-        reply_markup=markup
+        reply_markup=reply_markup
     )
 
 @bot.message_handler(commands=['help'])
