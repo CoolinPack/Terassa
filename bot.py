@@ -111,6 +111,12 @@ def show_orders(message):
         emoji = status_emoji.get(status, '❓')
         response += f"*#{order['id']}* {emoji} {status}\n"
         response += f"👤 {order['user_name']} {order['user_surname']}\n"
+        
+        # Добавляем кликабельную ссылку на ID клиента для удобства админа
+        client_tg_id = order.get('telegram_id')
+        if client_tg_id:
+            response += f"🆔 ID: [{client_tg_id}](tg://user?id={client_tg_id})\n"
+            
         response += f"💰 {order['total']} ₫\n"
         response += f"⏰ {order['created_at']}\n\n"
     bot.send_message(message.chat.id, response, parse_mode="Markdown")
@@ -259,11 +265,19 @@ def webhook():
         raw_username = (data.get('username') or '').strip()
         username_display = raw_username if raw_username and raw_username.lower() != 'не указан' else 'не указан'
 
+        client_telegram_id = data.get('telegram_id')
+        
+        # Формируем красивую ссылку на Telegram аккаунт админу для быстрой связи
+        if client_telegram_id:
+            telegram_id_display = f"[{client_telegram_id}](tg://user?id={client_telegram_id})"
+        else:
+            telegram_id_display = 'не указан'
+
         message = f"""🆕 *НОВЫЙ ЗАКАЗ # {order_id}*
 
 👤 *Клиент:* {data['user_name']} {data['user_surname']}
 📱 *Telegram:* @{username_display}
-🆔 *Telegram ID:* {data.get('telegram_id') or 'не указан'}
+🆔 *Telegram ID:* {telegram_id_display}
 
 📦 *Тип:* {delivery_text}
 
@@ -279,6 +293,11 @@ def webhook():
 
         markup = InlineKeyboardMarkup(row_width=1)
         markup.add(InlineKeyboardButton("✅ Принять заказ", callback_data=f"status_{order_id}_accepted"))
+        
+        # Если есть telegram_id клиента, добавляем удобную кнопку связи прямо под заказом
+        if client_telegram_id:
+            markup.add(InlineKeyboardButton("💬 Написать клиенту", url=f"tg://user?id={client_telegram_id}"))
+
         bot.send_message(target_chat, f"Управление заказом #{order_id}:", reply_markup=markup)
 
         return jsonify({'success': True, 'order_id': order_id})
@@ -438,6 +457,9 @@ CLIENT_MESSAGES = {
 }
 
 def next_status_markup(order_id, current_status, delivery_type):
+    order = db.get_order_by_id(order_id)
+    client_id = order.get('telegram_id') if order else None
+    
     markup = InlineKeyboardMarkup(row_width=1)
     if current_status == 'new':
         markup.add(InlineKeyboardButton("✅ Принять заказ", callback_data=f"status_{order_id}_accepted"))
@@ -448,6 +470,11 @@ def next_status_markup(order_id, current_status, delivery_type):
             markup.add(InlineKeyboardButton("🚴 Выдали курьеру", callback_data=f"status_{order_id}_courier"))
     elif current_status in ('ready', 'courier'):
         markup.add(InlineKeyboardButton("📦 Выдан", callback_data=f"status_{order_id}_completed"))
+        
+    # Дублируем кнопку связи для удобства на любом этапе
+    if client_id:
+        markup.add(InlineKeyboardButton("💬 Написать клиенту", url=f"tg://user?id={client_id}"))
+        
     return markup
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('status_'))
