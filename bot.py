@@ -55,8 +55,10 @@ def health():
 def send_welcome(message):
     web_app_url = "https://coolinpack.github.io/Terassa/"
 
-    # Кнопка внизу у поля ввода текста
-    reply_markup = ReplyKeyboardMarkup(resize_keyboard=True)
+    reply_markup = ReplyKeyboardMarkup(
+        resize_keyboard=True,
+        is_persistent=True  # кнопка всегда видна рядом с полем ввода
+    )
     reply_markup.add(KeyboardButton(text="🍽 Открыть меню", web_app=WebAppInfo(url=web_app_url)))
 
     bot.send_message(
