@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from config import config
 from database import db
-from menu_data import init_menu, get_menu_json
+from menu_data import init_menu
 from admin_upload import ImageUploader
 from flask import Flask, request, jsonify
 import threading
@@ -108,7 +108,7 @@ def show_orders(message):
         emoji = status_emoji.get(status, '❓')
         response += f"*#{order['id']}* {emoji} {status}\n"
         response += f"👤 {order['user_name']} {order['user_surname']}\n"
-        response += f"💰 {order['total']} ₽\n"
+        response += f"💰 {order['total']} ₫\n"
         response += f"⏰ {order['created_at']}\n\n"
     
     bot.send_message(message.chat.id, response, parse_mode="Markdown")
@@ -164,7 +164,7 @@ def handle_upload_callback(call):
     bot.edit_message_text(
         f"📸 Отправьте фото для блюда:\n\n"
         f"🍽 {dish['name']}\n"
-        f"💰 {dish['price']} ₽\n\n"
+        f"💰 {dish['price']} ₫\n\n"
         f"Просто отправьте фотографию",
         call.message.chat.id,
         call.message.message_id
@@ -244,7 +244,7 @@ def process_add_dish(message):
             f"✅ Блюдо добавлено!\n\n"
             f"ID: {dish_id}\n"
             f"Название: {dish_data['name']}\n"
-            f"Цена: {dish_data['price']} ₽\n"
+            f"Цена: {dish_data['price']} ₫\n"
             f"Категория: {dish_data['category']}\n\n"
             f"Теперь загрузите картинку: /upload"
         )
@@ -264,13 +264,27 @@ def webhook():
             if field not in data:
                 return jsonify({'error': f'Missing {field}'}), 400
         
+        # Проверяем, что клиент не пытается заказать блюдо, которое уже в стоп-листе.
+        for item in data.get('items', []):
+            try:
+                item_id = int(item.get('id'))
+            except (TypeError, ValueError):
+                continue
+            if item_id in db.get_stop_list_ids():
+                recommendations = db.get_recommendations(item_id, 3)
+                return jsonify({
+                    'error': 'Одно из блюд в заказе временно недоступно',
+                    'dish_id': item_id,
+                    'recommendations': recommendations
+                }), 409
+
         # Сохраняем заказ
         order_id = db.save_order(data)
         
         # Формируем чек для админа
         items_text = ""
         for idx, item in enumerate(data['items'], 1):
-            items_text += f"{idx}. {item['name']} x{item['quantity']} = {item['price'] * item['quantity']} ₽\n"
+            items_text += f"{idx}. {item['name']} x{item['quantity']} = {item['price'] * item['quantity']} ₫\n"
         
         delivery_text = "Заберу с собой" if data['delivery_type'] == 'pickup' else "Доставка"
         
@@ -278,6 +292,8 @@ def webhook():
 🆕 *НОВЫЙ ЗАКАЗ # {order_id}*
 
 👤 *Клиент:* {data['user_name']} {data['user_surname']}
+📱 *Telegram:* @{data.get('username') or 'не указан'}
+🆔 *Telegram ID:* {data.get('telegram_id') or 'не указан'}
 🎂 *Год рождения:* {data.get('user_birth_year', 'не указан')}
 
 📦 *Тип:* {delivery_text}
@@ -285,7 +301,7 @@ def webhook():
 🛒 *Состав заказа:*
 {items_text}
 
-💰 *Итого:* {data['total']} ₽
+💰 *Итого:* {data['total']} ₫
 
 ⏰ *Время:* {datetime.now().strftime('%d.%m.%Y %H:%M')}
         """
@@ -316,8 +332,69 @@ def webhook():
 
 @app.route('/menu', methods=['GET'])
 def get_menu():
-    menu = get_menu_json()
+    # SQLite хранит состояние стоп-листа. Это работает и для статических
+    # блюд из index.html, которых может не быть в menu_data.py.
+    menu = db.get_menu()
+    stop_ids = db.get_stop_list_ids()
+    for item in menu:
+        item['stop_list'] = bool(int(item.get('stop_list', 0)) or int(item['id']) in stop_ids)
+
+    known_ids = {int(item['id']) for item in menu}
+    for item in db.get_stop_list():
+        dish_id = int(item['dish_id'])
+        if dish_id not in known_ids:
+            menu.append({
+                'id': dish_id,
+                'name': item.get('name', ''),
+                'price': item.get('price', 0),
+                'category': item.get('category', ''),
+                'stop_list': True
+            })
     return jsonify(menu)
+
+
+def is_admin_telegram_id(telegram_id):
+    return str(telegram_id or '') == str(config.ADMIN_CHAT_ID)
+
+
+@app.route('/admin/check', methods=['GET'])
+def admin_check():
+    return jsonify({'is_admin': is_admin_telegram_id(request.args.get('telegram_id', ''))})
+
+
+@app.route('/admin/stop-list', methods=['POST'])
+def admin_stop_list():
+    try:
+        data = request.json or {}
+        telegram_id = data.get('telegram_id')
+        dish_id = int(data.get('dish_id'))
+        enabled = bool(data.get('enabled'))
+
+        if not is_admin_telegram_id(telegram_id):
+            return jsonify({'error': 'Нет прав'}), 403
+
+        dish = db.get_dish_by_id(dish_id) or {
+            'id': dish_id,
+            'name': data.get('name', ''),
+            'price': int(data.get('price', 0) or 0),
+            'category': data.get('category', '')
+        }
+        db.set_stop_list(dish_id, enabled, dish)
+
+        return jsonify({
+            'success': True,
+            'dish_id': dish_id,
+            'stop_list': enabled
+        })
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Некорректный ID блюда'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/admin/recommendations/<int:dish_id>', methods=['GET'])
+def recommendations(dish_id):
+    return jsonify(db.get_recommendations(dish_id, 3))
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('status_'))
 def handle_status_callback(call):
