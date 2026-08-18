@@ -112,7 +112,6 @@ def show_orders(message):
         response += f"*#{order['id']}* {emoji} {status}\n"
         response += f"👤 {order['user_name']} {order['user_surname']}\n"
         
-        # Добавляем кликабельную ссылку на ID клиента для удобства админа
         client_tg_id = order.get('telegram_id')
         if client_tg_id:
             response += f"🆔 ID: [{client_tg_id}](tg://user?id={client_tg_id})\n"
@@ -216,7 +215,7 @@ def process_add_dish(message):
         bot.reply_to(message, f"❌ Ошибка: {str(e)}")
 
 
-# ============ ОБРАБОТКА ЗАКАЗОВ (WEBHOOK) ============
+# ============ ОБРАБОТКА ЗАКАЗОВ (WEBHOOK С ЛОГАМИ) ============
 
 @app.route('/webhook', methods=['POST', 'OPTIONS'])
 def webhook():
@@ -225,10 +224,14 @@ def webhook():
             return ('', 204)
 
         data = request.get_json(silent=True) or {}
+        
+        # ЛОГИРОВАНИЕ: Печатаем весь входящий JSON в консоль Render
+        print(f"📥 [WEBHOOK] Получены данные заказа: {json.dumps(data, ensure_ascii=False)}")
 
         required = ['user_name', 'user_surname', 'items', 'total', 'delivery_type']
         for field in required:
             if field not in data:
+                print(f"❌ [WEBHOOK] Ошибка: отсутствует обязательное поле {field}")
                 return jsonify({'error': f'Missing {field}'}), 400
 
         for item in data.get('items', []):
@@ -244,17 +247,22 @@ def webhook():
                     'recommendations': recommendations
                 }), 409
 
-        # При оформлении заказа обновляем username пользователя в БД
+        # Извлекаем и проверяем telegram_id
         telegram_id = str(data.get('telegram_id', '')).strip()
-        if telegram_id:
+        print(f"🔍 [WEBHOOK] Извлеченный telegram_id: '{telegram_id}' (тип: {type(data.get('telegram_id'))})")
+
+        if telegram_id and telegram_id != 'undefined' and telegram_id != 'null':
             db.upsert_user(
                 telegram_id=telegram_id,
                 username=data.get('username') or None,
                 first_name=data.get('user_name'),
                 last_name=data.get('user_surname'),
             )
+        else:
+            print("⚠️ [WEBHOOK] Предупреждение: telegram_id пустой, равен 'undefined' или 'null'")
 
         order_id = db.save_order(data)
+        print(f"✅ [WEBHOOK] Заказ #{order_id} успешно сохранен в БД.")
 
         items_text = ""
         for idx, item in enumerate(data['items'], 1):
@@ -265,9 +273,8 @@ def webhook():
         raw_username = (data.get('username') or '').strip()
         username_display = raw_username if raw_username and raw_username.lower() != 'не указан' else 'не указан'
 
-        client_telegram_id = data.get('telegram_id')
+        client_telegram_id = telegram_id if (telegram_id and telegram_id != 'undefined' and telegram_id != 'null') else None
         
-        # Формируем красивую ссылку на Telegram аккаунт админу для быстрой связи
         if client_telegram_id:
             telegram_id_display = f"[{client_telegram_id}](tg://user?id={client_telegram_id})"
         else:
@@ -294,7 +301,6 @@ def webhook():
         markup = InlineKeyboardMarkup(row_width=1)
         markup.add(InlineKeyboardButton("✅ Принять заказ", callback_data=f"status_{order_id}_accepted"))
         
-        # Если есть telegram_id клиента, добавляем удобную кнопку связи прямо под заказом
         if client_telegram_id:
             markup.add(InlineKeyboardButton("💬 Написать клиенту", url=f"tg://user?id={client_telegram_id}"))
 
@@ -303,6 +309,9 @@ def webhook():
         return jsonify({'success': True, 'order_id': order_id})
 
     except Exception as e:
+        print(f"🔥 [WEBHOOK ERROR] Исключение: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 
@@ -344,7 +353,7 @@ def admin_check():
     return jsonify({'is_admin': is_admin_telegram_id(telegram_id), 'telegram_id': telegram_id})
 
 
-# ============ СИНХРОНИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ ============
+# ============ СИНХРОНИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ (С ЛОГАМИ) ============
 
 @app.route('/user/sync', methods=['POST', 'OPTIONS'])
 def user_sync():
@@ -352,8 +361,11 @@ def user_sync():
         return ('', 204)
     try:
         data = request.json or {}
+        print(f"🔄 [USER_SYNC] Получены данные синхронизации: {json.dumps(data, ensure_ascii=False)}")
+        
         telegram_id = str(data.get('telegram_id', '')).strip()
-        if not telegram_id:
+        if not telegram_id or telegram_id == 'undefined' or telegram_id == 'null':
+            print("❌ [USER_SYNC] Ошибка: telegram_id отсутствует, пустой или равен 'undefined'")
             return jsonify({'error': 'telegram_id required'}), 400
 
         db.upsert_user(
@@ -365,8 +377,10 @@ def user_sync():
             gender=data.get('gender') or None
         )
         user = db.get_user(telegram_id)
+        print(f"✅ [USER_SYNC] Пользователь {telegram_id} успешно синхронизирован.")
         return jsonify({'success': True, 'user': user})
     except Exception as e:
+        print(f"🔥 [USER_SYNC ERROR] {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
@@ -471,7 +485,6 @@ def next_status_markup(order_id, current_status, delivery_type):
     elif current_status in ('ready', 'courier'):
         markup.add(InlineKeyboardButton("📦 Выдан", callback_data=f"status_{order_id}_completed"))
         
-    # Дублируем кнопку связи для удобства на любом этапе
     if client_id:
         markup.add(InlineKeyboardButton("💬 Написать клиенту", url=f"tg://user?id={client_id}"))
         
