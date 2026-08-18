@@ -1825,56 +1825,88 @@ body{background:#f5f2ed;color:var(--ink);}
         loadStoppedItems();
     }
 
-    // Синхронизируем username с Telegram при каждом открытии приложения.
-    // Это важно, если пользователь установил username уже после регистрации.
-    async function syncTelegramUser() {
-        try {
-            const tgUser = getTelegramUser();
-            if (!tgUser || !user) return;
-            user.username = tgUser.username || null;
-            user.telegramId = tgUser.id || null;
+async function syncTelegramUser() {
+    try {
+        const tgUser = getTelegramUser();
+        if (!tgUser || !tgUser.id) return;
+
+        // Всегда берём свежий username прямо из Telegram
+        const freshUsername = tgUser.username || null;
+
+        // Обновляем локально
+        if (user) {
+            user.username = freshUsername;
+            user.telegramId = tgUser.id;
             saveUserToStorage();
-            await refreshAdminStatus();
-            await loadStoppedItems();
-            renderCart();
-            renderProfile();
-            renderMenu();
-        } catch (e) {}
-    }
+        }
 
-    // Проверяем сохранённого пользователя
-    if (loadUserFromStorage()) {
-        document.getElementById('authScreen').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        renderAll();
-        syncTelegramUser();
-    }
-
-    // Telegram WebApp
-    if (window.Telegram?.WebApp) {
+        // Синхронизируем с сервером — username сохраняется в БД
         try {
-            window.Telegram.WebApp.expand();
-            const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-            if (tgUser) {
-                if (user) {
-                    user.username = tgUser.username || null;
-                    user.telegramId = tgUser.id || null;
-                    saveUserToStorage();
-                    refreshAdminStatus();
-                    loadStoppedItems();
-                    renderCart();
-                    renderProfile();
-                    renderMenu();
-                }
-                if (!document.getElementById('authName').value) {
-                    document.getElementById('authName').value = tgUser.first_name || '';
-                }
-                if (!document.getElementById('authSurname').value) {
-                    document.getElementById('authSurname').value = tgUser.last_name || '';
-                }
+            const response = await fetch(`${API_BASE}/user/sync`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    telegram_id: tgUser.id,
+                    username: freshUsername,
+                    first_name: tgUser.first_name || null,
+                    last_name: tgUser.last_name || null,
+                    birth_date: user?.birthDate || null,
+                    gender: user?.gender || null
+                })
+            });
+            const result = await response.json();
+            // Если сервер вернул актуальный username — используем его
+            if (result.success && result.user && user) {
+                user.username = result.user.username || freshUsername;
+                saveUserToStorage();
             }
-        } catch(e) {}
+        } catch (e) {
+            console.warn('Не удалось синхронизировать с сервером:', e);
+        }
+
+        await refreshAdminStatus();
+        await loadStoppedItems();
+        renderCart();
+        renderProfile();
+        renderMenu();
+    } catch (e) {
+        console.warn('syncTelegramUser error:', e);
     }
+}
+
+// Проверяем сохранённого пользователя
+if (loadUserFromStorage()) {
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderAll();
+    syncTelegramUser();
+}
+
+// Telegram WebApp
+if (window.Telegram?.WebApp) {
+    try {
+        window.Telegram.WebApp.expand();
+        const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+        if (tgUser) {
+            if (user) {
+                user.username = tgUser.username || null;
+                user.telegramId = tgUser.id || null;
+                saveUserToStorage();
+                refreshAdminStatus();
+                loadStoppedItems();
+                renderCart();
+                renderProfile();
+                renderMenu();
+            }
+            if (!document.getElementById('authName').value) {
+                document.getElementById('authName').value = tgUser.first_name || '';
+            }
+            if (!document.getElementById('authSurname').value) {
+                document.getElementById('authSurname').value = tgUser.last_name || '';
+            }
+        }
+    } catch(e) {}
+}
 
     console.log('Terassa Restaurant Mini App загружен!');
     console.log('Админ режим:', user?.isAdmin || false);
